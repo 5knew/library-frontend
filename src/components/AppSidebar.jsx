@@ -1,146 +1,190 @@
-// src/components/AppSidebar.js
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { FiSun, FiMoon } from 'react-icons/fi';
-import { useTheme } from "@/components/ThemeProvider"; // Ensure theme provider is correctly imported
-import {jwtDecode} from 'jwt-decode';
+// src/components/AppSidebar.jsx
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { Home, BookOpen, Users, Folder, Edit3,Edit2,  Clipboard, ShoppingCart, CreditCard, User, Heart, LogOut } from "lucide-react";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar";
 
-const AppSidebar = ({ isOpen, toggleSidebar }) => {
-    const navigate = useNavigate();
-    const token = localStorage.getItem('token');
-    const { theme, setTheme } = useTheme(); // Access theme state and setter from theme context
-    let userRole = '';
+// Menu items for different user roles
+const items = [
+  { title: "Home", url: "/", icon: Home },
+  { title: "Books", url: "/books-with-copies", icon: BookOpen },
+  { title: "Create/Edit Authors", url: "/authors", icon: Clipboard },
+  { title: "Cart", url: "/cart", icon: ShoppingCart },
+];
 
-    if (token) {
-        const decodedToken = jwtDecode(token);
-        userRole = decodedToken.role;
-    }
+const itemLibrary = [
+  { title: "Add Book", url: "/add-book", icon: Edit3 },
+  { title: "Add Book Instances", url: "/add-book-copy", icon: Edit2 },
+  { title: "Users", url: "/users", icon: Users },
+  { title: "Create/Edit Categories", url: "/categories", icon: Folder },
+  { title: "Create/Edit Authors", url: "/authors", icon: Clipboard },
+];
 
-    // Theme toggle handler
-    const handleThemeToggle = () => {
-        const newTheme = theme === 'dark' ? 'light' : 'dark';
-        setTheme(newTheme);
-    };
+const itemAdmins = [
+  { title: "Users", url: "/users", icon: Users },
+  { title: "Add Users", url: "/add-user", icon: Users },
+  { title: "Cart", url: "/cart", icon: ShoppingCart },
+  { title: "Payments", url: "/payments", icon: CreditCard },
+];
 
-    return (
-        <aside className={`transition-all duration-300 ease-in-out ${isOpen ? 'w-52' : 'w-20'} bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 text-white h-screen shadow-lg p-4 flex flex-col`}>
-            {/* Sidebar Toggle and Theme Button */}
-            <div className="flex justify-between items-center mb-6">
-                <button onClick={toggleSidebar} className="text-white p-2 rounded hover:bg-blue-700 transition duration-200">
-                    {isOpen ? '⟨' : '⟩'}
-                </button>
-                {isOpen && (
-                    <button onClick={handleThemeToggle} className="text-white p-2 rounded hover:bg-blue-700 transition duration-200">
-                        {theme === 'dark' ? '☀️' : '🌙'}
-                    </button>
-                )}
-            </div>
+const itemStudents = [
+  { title: "Books", url: "/books-with-copies", icon: BookOpen },
+  { title: "Cart", url: "/cart", icon: ShoppingCart },
+  { title: "Payments", url: "/payments", icon: CreditCard },
+];
 
-            {/* Navigation Links */}
-            <ul className="space-y-6 mt-4">
-                <li>
-                <ul className="space-y-4 ml-2">
-                    <Link to="/" className="block hover:text-blue-200 transition duration-200">
-                        <span className="flex items-center gap-2">
-                            {isOpen ? '🏠 Home' : '🏠'}
-                        </span>
+const itemProfiles = [
+  { title: "Favorites", url: "/favorites", icon: Heart },
+  { title: "Profile", url: "/profile", icon: User },
+  { title: "Log Out", url: "#", icon: LogOut },
+];
+
+const itemUnauthorized = [
+  { title: "Sign In", url: "/signin", icon: User },
+  { title: "Sign Up", url: "/signup", icon: Heart },
+];
+
+export default function AppSidebar() {
+  const [userRole, setUserRole] = useState(null);
+  const navigate = useNavigate();
+
+  // Fetch user role from localStorage
+  useEffect(() => {
+    const role = localStorage.getItem('userRole');
+    setUserRole(role); // Set the user role from localStorage
+  }, []); // Only run on component mount
+
+  // Handle Logout
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('userRole');
+    setUserRole(null); // Reset the user role
+    navigate('/signin');
+  };
+
+  return (
+    <Sidebar>
+      <SidebarHeader>
+        <span className="font-semibold">AUES LIBRARY</span>
+      </SidebarHeader>
+      <SidebarContent>
+        {/* General Library Panel - Available to All */}
+        <SidebarGroup>
+          <SidebarGroupLabel>User Panel</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {items.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <Link to={item.url} className="flex items-center gap-2">
+                      <item.icon className="h-5 w-5" />
+                      <span>{item.title}</span>
                     </Link>
-                </ul>
-                </li>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
 
-                {token && (
-                    <>
-                        {/* Manage Section */}
-                        {(userRole === 'ROLE_LIBRARIAN' || userRole === 'ROLE_ADMIN') && (
-                            <div>
-                                {isOpen && <h3 className="text-lg font-semibold text-blue-100 mt-4 mb-2">Manage</h3>}
-                                <ul className="space-y-4 ml-2">
-                                    {userRole === 'ROLE_LIBRARIAN' && (
-                                        <>
-                                            <li>
-                                                <Link to="/add-book" className="block hover:text-blue-200 transition duration-200">
-                                                    <span className="flex items-center gap-2">
-                                                        {isOpen ? '📖 Add Book' : '📖'}
-                                                    </span>
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                <Link to="/book-copies" className="block hover:text-blue-200 transition duration-200">
-                                                    <span className="flex items-center gap-2">
-                                                        {isOpen ? '📚 Book Copies' : '📚'}
-                                                    </span>
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                <Link to="/categories" className="block hover:text-blue-200 transition duration-200">
-                                                    <span className="flex items-center gap-2">
-                                                        {isOpen ? '📂 Categories' : '📂'}
-                                                    </span>
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                <Link to="/authors" className="block hover:text-blue-200 transition duration-200">
-                                                    <span className="flex items-center gap-2">
-                                                        {isOpen ? '🖋️ Authors' : '🖋️'}
-                                                    </span>
-                                                </Link>
-                                            </li>
-                                        </>
-                                    )}
-                                    {userRole === 'ROLE_ADMIN' && (
-                                        <li>
-                                            <Link to="/add-user" className="block hover:text-blue-200 transition duration-200">
-                                                <span className="flex items-center gap-2">
-                                                    {isOpen ? '👤 Add User' : '👤'}
-                                                </span>
-                                            </Link>
-                                        </li>
-                                    )}
-                                    <li>
-                                        <Link to="/books-with-copies" className="block hover:text-blue-200 transition duration-200">
-                                            <span className="flex items-center gap-2">
-                                                {isOpen ? '📘 Books with Copies' : '📘'}
-                                            </span>
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link to="/users" className="block hover:text-blue-200 transition duration-200">
-                                            <span className="flex items-center gap-2">
-                                                {isOpen ? '👥 Users' : '👥'}
-                                            </span>
-                                        </Link>
-                                    </li>
-                                </ul>
-                            </div>
-                        )}
+        {/* Admin Panel - Only for admin */}
+        {userRole === 'ROLE_LIBRARIAN' && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Library Panel</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {itemLibrary.map((itemLibrary) => (
+                  <SidebarMenuItem key={itemLibrary.title}>
+                    <SidebarMenuButton asChild>
+                      <Link to={itemLibrary.url} className="flex items-center gap-2">
+                        <itemLibrary.icon className="h-5 w-5" />
+                        <span>{itemLibrary.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
 
-                        {/* Library Actions Section */}
-                        {(userRole === 'ROLE_LIBRARIAN' || userRole === 'ROLE_STUDENT') && (
-                            <div>
-                                {isOpen && <h3 className="text-lg font-semibold text-blue-100 mt-6 mb-2">Library Actions</h3>}
-                                <ul className="space-y-4 ml-2">
-                                    <li>
-                                        <Link to="/cart" className="block hover:text-blue-200 transition duration-200">
-                                            <span className="flex items-center gap-2">
-                                                {isOpen ? '🛒 Cart' : '🛒'}
-                                            </span>
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link to="/payments" className="block hover:text-blue-200 transition duration-200">
-                                            <span className="flex items-center gap-2">
-                                                {isOpen ? '💳 Payments' : '💳'}
-                                            </span>
-                                        </Link>
-                                    </li>
-                                </ul>
-                            </div>
-                        )}
-                    </>
+         {/* Admin Panel - Only for admin */}
+         {userRole === 'ROLE_ADMIN' && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Admin Panel</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {itemAdmins.map((itemAdmin) => (
+                  <SidebarMenuItem key={itemAdmin.title}>
+                    <SidebarMenuButton asChild>
+                      <Link to={itemAdmin.url} className="flex items-center gap-2">
+                        <itemAdmin.icon className="h-5 w-5" />
+                        <span>{itemAdmin.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
+        {/* Student Panel - Only for students */}
+        {userRole === 'ROLE_STUDENT' && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Student Panel</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {itemStudents.map((itemStudent) => (
+                  <SidebarMenuItem key={itemStudent.title}>
+                    <SidebarMenuButton asChild>
+                      <Link to={itemStudent.url} className="flex items-center gap-2">
+                        <itemStudent.icon className="h-5 w-5" />
+                        <span>{itemStudent.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+      </SidebarContent>
+
+      {/* Footer with Profile Links */}
+      <SidebarFooter>
+        <SidebarMenu>
+          {(userRole ? itemProfiles : itemUnauthorized).map((itemProfile) => (
+            <SidebarMenuItem key={itemProfile.title}>
+              <SidebarMenuButton asChild>
+                {itemProfile.title === "Log Out" ? (
+                  <button onClick={handleLogout} className="flex items-center gap-2 text-red-600">
+                    <itemProfile.icon className="h-5 w-5" />
+                    <span>{itemProfile.title}</span>
+                  </button>
+                ) : (
+                  <Link to={itemProfile.url} className="flex items-center gap-2">
+                    <itemProfile.icon className="h-5 w-5" />
+                    <span>{itemProfile.title}</span>
+                  </Link>
                 )}
-            </ul>
-        </aside>
-    );
-};
-
-export default AppSidebar;
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
+  );
+}

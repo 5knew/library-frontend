@@ -110,7 +110,6 @@ function AdvancedSearch({ onSearch }) {
                     onChange={handleSelectChange}
                     value={authors.filter(author => filters.authorIds.includes(author.value))}
                     noOptionsMessage={() => loading ? "Loading..." : "No authors available"}
-                    styles={customSelectStyles}
                 />
 
                 <Label>Categories</Label>
@@ -124,7 +123,6 @@ function AdvancedSearch({ onSearch }) {
                     onChange={handleSelectChange}
                     value={categories.filter(category => filters.categoryIds.includes(category.value))}
                     noOptionsMessage={() => loading ? "Loading..." : "No categories available"}
-                    styles={customSelectStyles}
 
                 />
             </div>

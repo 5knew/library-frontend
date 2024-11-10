@@ -9,6 +9,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from '@/lib/utils'; // Helper function for conditionally combining classes
+
 import {jwtDecode} from 'jwt-decode'; // Ensure jwt-decode is installed and imported
 
 const Navbar = () => {
@@ -28,107 +30,92 @@ const Navbar = () => {
     };
 
     return (
-        <nav className="bg-gradient-to-r from-blue-600 to-blue-500 text-white py-4 shadow-md">
-            <div className="container mx-auto max-w-6xl flex justify-between items-center">
-                <div className="text-lg font-bold tracking-wider">
-                    <Link to="/" className="text-white">
-                        AUES UNIVERSITY LIBRARY
-                    </Link>
-                </div>
-
-                <ul className="flex space-x-6 items-center">
-                    <li>
-                        <Link to="/" className="hover:text-blue-200 transition duration-200 ease-in-out">
-                            Home
-                        </Link>
-                    </li>
-
-                    {token ? (
-                        <>
-                            {(userRole === 'ROLE_LIBRARIAN' || userRole === 'ROLE_ADMIN') && (
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button className="hover:text-blue-200 transition duration-200 ease-in-out">
-                                            Manage
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent>
-                                        {userRole === 'ROLE_LIBRARIAN' && (
-                                            <>
-                                                <DropdownMenuItem asChild>
-                                                    <Link to="/add-book">Add Book</Link>
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem asChild>
-                                                    <Link to="/book-copies">Book Copies</Link>
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem asChild>
-                                                    <Link to="/categories">Categories</Link>
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem asChild>
-                                                    <Link to="/authors">Authors</Link>
-                                                </DropdownMenuItem>
-                                            </>
-                                        )}
-                                        {userRole === 'ROLE_ADMIN' && (
-                                            <DropdownMenuItem asChild>
-                                                <Link to="/add-user">Add User</Link>
-                                            </DropdownMenuItem>
-                                        )}
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem asChild>
-                                            <Link to="/books-with-copies">Books with Copies</Link>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem asChild>
-                                            <Link to="/users">Users</Link>
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            )}
-
-                            {(userRole === 'ROLE_LIBRARIAN' || userRole === 'ROLE_STUDENT') && (
-                                <>
-                                    <li>
-                                        <Link to="/cart" className="hover:text-blue-200 transition duration-200 ease-in-out">
-                                            Cart
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link to="/payments" className="hover:text-blue-200 transition duration-200 ease-in-out">
-                                            Payments
-                                        </Link>
-                                    </li>
-                                </>
-                            )}
-
-                            {/* Logout Button */}
-                            <li>
-                                <Button
-                                    onClick={handleLogout}
-                                    variant="destructive"
-                                    className="transition duration-200 ease-in-out"
-                                >
-                                    Logout
-                                </Button>
-                            </li>
-                        </>
-                    ) : (
-                        <>
-                            <li>
-                                <Link to="/signin" className="hover:text-blue-200 transition duration-200 ease-in-out">
-                                    Sign In
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/signup" className="hover:text-blue-200 transition duration-200 ease-in-out">
-                                    Sign Up
-                                </Link>
-                            </li>
-                        </>
-                    )}
-                </ul>
-            </div>
+        <nav className="bg-gradient-to-r text-white shadow-md">
+          <div className="max-w-6xl mx-auto flex justify-between items-center p-4">
+            <Link to="/" className="text-lg font-bold text-white tracking-wide">
+              AUES UNIVERSITY LIBRARY
+            </Link>
+    
+            <ul className="flex gap-4 items-center list-none m-0 p-0">
+              <li>
+                <Link to="/" className="text-white no-underline">
+                  Home
+                </Link>
+              </li>
+    
+              {token ? (
+                <>
+                  {(userRole === 'ROLE_LIBRARIAN' || userRole === 'ROLE_ADMIN') && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="bg-none text-white cursor-pointer">
+                          Manage
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="bg-white text-gray-800 rounded-lg p-2">
+                        {userRole === 'ROLE_LIBRARIAN' && (
+                          <>
+                            <DropdownMenuItem asChild>
+                              <Link to="/add-book" className="text-gray-800 no-underline">Add Book</Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <Link to="/book-copies" className="text-gray-800 no-underline">Book Copies</Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <Link to="/categories" className="text-gray-800 no-underline">Categories</Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <Link to="/authors" className="text-gray-800 no-underline">Authors</Link>
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                        {userRole === 'ROLE_ADMIN' && (
+                          <DropdownMenuItem asChild>
+                            <Link to="/add-user" className="text-gray-800 no-underline">Add User</Link>
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                          <Link to="/books-with-copies" className="text-gray-800 no-underline">Books with Copies</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/users" className="text-gray-800 no-underline">Users</Link>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+    
+                  {(userRole === 'ROLE_LIBRARIAN' || userRole === 'ROLE_STUDENT') && (
+                    <>
+                      <li>
+                        <Link to="/cart" className="text-white no-underline">Cart</Link>
+                      </li>
+                      <li>
+                        <Link to="/payments" className="text-white no-underline">Payments</Link>
+                      </li>
+                    </>
+                  )}
+    
+                  <li>
+                    <Button onClick={handleLogout} variant="destructive" className="bg-red-600 text-white cursor-pointer">
+                      Logout
+                    </Button>
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li>
+                    <Link to="/signin" className="text-white no-underline">Sign In</Link>
+                  </li>
+                  <li>
+                    <Link to="/signup" className="text-white no-underline">Sign Up</Link>
+                  </li>
+                </>
+              )}
+            </ul>
+          </div>
         </nav>
-    );
-};
-
-export default Navbar;
+      );
+    };
+    
+    export default Navbar;

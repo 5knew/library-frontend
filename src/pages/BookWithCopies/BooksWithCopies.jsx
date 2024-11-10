@@ -8,6 +8,10 @@ import { BookCopyService } from '@/Services/BookCopyService/BookCopyService';
 import AdvancedSearchBookWithCopies from '@/components/AdvancedSearchBookWithCopies';
 import { CartItemService } from '@/Services/CartItemService/CartItemService';
 
+import { FaHeart, FaChevronDown, FaChevronUp, FaCartPlus } from 'react-icons/fa';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
 function BooksWithCopies() {
     const [books, setBooks] = useState([]);
     const [expandedBookId, setExpandedBookId] = useState(null);
@@ -146,8 +150,8 @@ function BooksWithCopies() {
     
 
     return (
-        <div className="container mx-auto p-6 max-w-5xl bg-gray-50 rounded-lg shadow-lg">
-            <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">Books and Their Copies</h1>
+        <div className="w-full p-8 bg-gray-50 rounded-lg shadow-lg mx-auto">
+            <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">Books and its Instances</h1>
 
             {/* Advanced Search Form */}
             <AdvancedSearchBookWithCopies onSearch={handleAdvancedSearch} />
@@ -160,11 +164,11 @@ function BooksWithCopies() {
                             <div className="flex items-center">
                                 {/* Favorite Icon */}
                                 <button onClick={() => handleFavoriteToggle(book.id)} className="text-red-500 mr-4">
-                                    <FontAwesomeIcon icon={faHeart} style={{ color: favoriteBookIds.includes(book.id) ? 'red' : 'gray' }} />
+                                    <FaHeart style={{ color: favoriteBookIds.includes(book.id) ? 'red' : 'gray' }} />
                                 </button>
                                 {/* Expand/Collapse Icon */}
                                 <button onClick={() => toggleBookExpansion(book.id)} className="text-gray-500 hover:text-blue-500">
-                                    <FontAwesomeIcon icon={expandedBookId === book.id ? faChevronUp : faChevronDown} />
+                                    {expandedBookId === book.id ? <FaChevronUp /> : <FaChevronDown />}
                                 </button>
                             </div>
                         </div>
@@ -172,13 +176,13 @@ function BooksWithCopies() {
                         {/* Book Details */}
                         <div className="flex mt-4">
                             <div>
-                            {book.categories && book.categories.length > 0 && (
-                                        <p className="text-lg text-gray-600 mb-2">
-                                            <strong>Categories:</strong> {book.categories.map((category, index) => (
-                                                <span key={index}>{category.name}{index < book.categories.length - 1 ? ', ' : ''}</span>
-                                            ))}
-                                        </p>
-                                    )}
+                                {book.categories && book.categories.length > 0 && (
+                                    <p className="text-lg text-gray-600 mb-2">
+                                        <strong>Categories:</strong> {book.categories.map((category, index) => (
+                                            <span key={index}>{category.name}{index < book.categories.length - 1 ? ', ' : ''}</span>
+                                        ))}
+                                    </p>
+                                )}
                                 <p className="text-lg text-gray-600 mb-2"><strong>Authors:</strong> {book.authors?.map(author => author.name).join(', ')}</p>
                                 <p className="text-lg text-gray-600 mb-2"><strong>ISBN:</strong> {book.isbn}</p>
                                 <p className="text-lg text-gray-600 mb-4"><strong>Description:</strong> {book.description}</p>
@@ -193,22 +197,23 @@ function BooksWithCopies() {
                                     <table className="w-full table-auto bg-white rounded-lg shadow-md">
                                         <thead className="bg-blue-500 text-white">
                                             <tr>
-                                                <th className="p-4 text-left">Price</th>
+                                                
                                                 <th className="p-4 text-left">Publication Date</th>
                                                 <th className="p-4 text-left">Language</th>
+                                                <th className="p-4 text-left">Price</th>
                                                 <th className="p-4 text-center">Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {book.copies.map(copy => (
                                                 <tr key={copy.id} className="border-b hover:bg-gray-100">
-                                                    <td className="p-4">${copy.price}</td>
                                                     <td className="p-4">{new Date(copy.publicationDate).toLocaleDateString()}</td>
                                                     <td className="p-4">{copy.language}</td>
+                                                    <td className="p-4">{copy.price} тг</td>
                                                     <td className="p-4 text-center">
-                                                        <button onClick={() => handleAddToCart(copy.id)} className="bg-yellow-500 text-white py-1 px-3 rounded-md hover:bg-yellow-600">
-                                                            <FontAwesomeIcon icon={faCartPlus} /> Add to Cart
-                                                        </button>
+                                                        <Button onClick={() => handleAddToCart(copy.id)} className="bg-yellow-500 text-white py-1 px-3 rounded-md hover:bg-yellow-600 flex items-center gap-2">
+                                                            <FaCartPlus /> Add to Cart
+                                                        </Button>
                                                     </td>
                                                 </tr>
                                             ))}

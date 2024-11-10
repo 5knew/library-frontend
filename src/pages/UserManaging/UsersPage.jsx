@@ -3,6 +3,10 @@ import UserService from '../../Services/UserManagingService/UserService';
 import UserDetail from './UserDetail';
 import { jwtDecode } from 'jwt-decode';
 
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Card } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+
 const UsersPage = () => {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -54,42 +58,43 @@ const UsersPage = () => {
   if (error) return <div>Error fetching users: {error}</div>;
 
   return (
-    <div className="max-w-6xl mx-auto my-10 p-6 bg-white shadow-lg rounded-lg">
-    <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">All Users</h1>
+    <Card className="max-w-6xl mx-auto my-10 shadow-lg rounded-lg">
+      <Label asChild>
+        <h1 className="text-3xl font-bold text-center my-6">All Users</h1>
+      </Label>
 
-    {isEmpty ? (
-        <div className="text-center text-gray-500">No users found.</div>
-    ) : (
+      {isEmpty ? (
+        <div className="text-center text-muted">No users found.</div>
+      ) : (
         <div className="overflow-x-auto">
-            <table className="w-full table-auto border-collapse">
-                <thead>
-                    <tr className="bg-blue-100 text-gray-600 uppercase text-sm font-semibold">
-                        <th className="py-4 px-6 text-left">Name</th>
-                        <th className="py-4 px-6 text-left">Email</th>
-                        <th className="py-4 px-6 text-left">Role</th>
-                        <th className="py-4 px-6 text-center">Status</th>
-                        {userRole === 'ROLE_ADMIN' && (
-                            <th className="py-4 px-6 text-center">Actions</th>
-                        )}
-                    </tr>
-                </thead>
-                <tbody className="text-gray-700">
-                    {users.map(user => (
-                        <UserDetail
-                            key={user.id}
-                            user={user}
-                            userRole={userRole}
-                            onUserUpdated={handleUserUpdated}
-                            onUserDeleted={handleUserDeleted}
-                        />
-                    ))}
-                </tbody>
-            </table>
+          <Table className="w-full">
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead className="text-center">Status</TableHead>
+                {userRole === 'ROLE_ADMIN' && (
+                  <TableHead className="text-center">Actions</TableHead>
+                )}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {users.map((user) => (
+                <UserDetail
+                  key={user.id}
+                  user={user}
+                  userRole={userRole}
+                  onUserUpdated={handleUserUpdated}
+                  onUserDeleted={handleUserDeleted}
+                />
+              ))}
+            </TableBody>
+          </Table>
         </div>
-    )}
-</div>
-
+      )}
+    </Card>
   );
-};
+}
 
 export default UsersPage;

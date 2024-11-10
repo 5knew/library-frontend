@@ -138,7 +138,7 @@ function Books() {
 
     return (
         <div className="container mx-auto p-6 space-y-8">
-            <Label>Books</Label>
+            <Label className='text-5xl'>Books</Label>
 
             <div className="flex justify-between items-center">
                 <form onSubmit={handleBasicSearch} className="flex gap-2">
