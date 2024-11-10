@@ -37,10 +37,10 @@ const createBookCopy = async (formData) => {
 
 const getCopiesByBookId = async (bookId) => {
     try {
-        const response = await axios.get(`${BASE_URL}/${bookId}`, { headers: getAuthHeader() });
+        const response = await axios.get(`http://localhost:8080/api/v1/book-copies/by-book/${bookId}`);
         return response.data;
     } catch (error) {
-        console.error("Error fetching copies for book by ID:", error.response || error);
+        console.error("Error fetching copies for book by ID:", error);
         throw error;
     }
 };

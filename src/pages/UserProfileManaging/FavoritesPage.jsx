@@ -38,7 +38,7 @@ function FavoritesPage() {
             const favoriteBookIds = await UserDetailService.getUserFavorites(userId);
             const booksWithCopies = await Promise.all(favoriteBookIds.map(async (bookId) => {
                 const bookData = await BookService.getBookById(bookId);
-                const copiesData = await BookCopyService.getCopiesByBookId(bookId);
+                const copiesData = await BookCopyService.getCopiesByBookId(bookId) || [];
                 return { ...bookData, copies: copiesData };
             }));
             setFavoriteBooks(booksWithCopies);
@@ -123,7 +123,7 @@ function FavoritesPage() {
                             {expandedBookId === book.id && (
                                 <div className="mt-6">
                                     <h4 className="text-xl font-semibold mb-4">Copy Details</h4>
-                                    {book.copies ? (
+                                    {book.copies && book.copies.length > 0 ? (
                                         <table className="w-full table-auto bg-white rounded-lg shadow-md">
                                             <thead className="bg-blue-500 text-white rounded-lg">
                                                 <tr>
@@ -134,19 +134,21 @@ function FavoritesPage() {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr className="border-b hover:bg-gray-50 transition">
-                                                    <td className="p-4">${book.copies.price}</td>
-                                                    <td className="p-4">{new Date(book.copies.publicationDate).toLocaleDateString()}</td>
-                                                    <td className="p-4">{book.copies.language}</td>
-                                                    <td className="p-4 text-center">
-                                                        <button
-                                                            onClick={() => handleAddToCart(book.copies.id)}
-                                                            className="bg-yellow-500 text-white py-1 px-3 rounded-md hover:bg-yellow-600 transition"
-                                                        >
-                                                            <FontAwesomeIcon icon={faCartPlus} /> Add to Cart
-                                                        </button>
-                                                    </td>
-                                                </tr>
+                                                {book.copies.map((copy) => (
+                                                    <tr key={copy.id} className="border-b hover:bg-gray-50 transition">
+                                                        <td className="p-4">${copy.price}</td>
+                                                        <td className="p-4">{new Date(copy.publicationDate).toLocaleDateString()}</td>
+                                                        <td className="p-4">{copy.language}</td>
+                                                        <td className="p-4 text-center">
+                                                            <button
+                                                                onClick={() => handleAddToCart(copy.id)}
+                                                                className="bg-yellow-500 text-white py-1 px-3 rounded-md hover:bg-yellow-600 transition"
+                                                            >
+                                                                <FontAwesomeIcon icon={faCartPlus} /> Add to Cart
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
                                             </tbody>
                                         </table>
                                     ) : (
