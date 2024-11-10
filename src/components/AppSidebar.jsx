@@ -1,13 +1,14 @@
 // src/components/AppSidebar.js
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { jwtDecode } from 'jwt-decode';
-import { FiHome, FiBook, FiUser, FiShoppingCart, FiCreditCard, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiSun, FiMoon } from 'react-icons/fi';
+import { useTheme } from "@/components/ThemeProvider"; // Ensure theme provider is correctly imported
+import {jwtDecode} from 'jwt-decode';
 
 const AppSidebar = ({ isOpen, toggleSidebar }) => {
     const navigate = useNavigate();
     const token = localStorage.getItem('token');
+    const { theme, setTheme } = useTheme(); // Access theme state and setter from theme context
     let userRole = '';
 
     if (token) {
@@ -15,35 +16,36 @@ const AppSidebar = ({ isOpen, toggleSidebar }) => {
         userRole = decodedToken.role;
     }
 
-   
-    return (
-        <aside className={`transition-all duration-300 ease-in-out ${isOpen ? 'w-52' : 'w-20'} bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 text-white h-screen shadow-2xl rounded-lg p-4 flex flex-col justify-between`}>
-            {/* Sidebar Toggle Button */}
-            <div className="flex justify-end mb-4">
-                <button onClick={toggleSidebar} className="text-white p-2 rounded hover:bg-blue-700 transition duration-200">
-                    {isOpen ? <FiChevronLeft size={20} /> : <FiChevronRight size={20} />}
-                </button>
-            </div>
+    // Theme toggle handler
+    const handleThemeToggle = () => {
+        const newTheme = theme === 'dark' ? 'light' : 'dark';
+        setTheme(newTheme);
+    };
 
-            {/* Logo / Title */}
-            <div className={`text-center ${isOpen ? 'text-2xl font-bold tracking-wider mb-8' : 'text-xl mb-8'}`}>
-                <Link to="/" className="text-white hover:text-blue-200 transition duration-300">
-                    {isOpen ? 'AUES UNIVERSITY LIBRARY' : 'AUES'}
-                </Link>
+    return (
+        <aside className={`transition-all duration-300 ease-in-out ${isOpen ? 'w-52' : 'w-20'} bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 text-white h-screen shadow-lg p-4 flex flex-col`}>
+            {/* Sidebar Toggle and Theme Button */}
+            <div className="flex justify-between items-center mb-6">
+                <button onClick={toggleSidebar} className="text-white p-2 rounded hover:bg-blue-700 transition duration-200">
+                    {isOpen ? '⟨' : '⟩'}
+                </button>
+                {isOpen && (
+                    <button onClick={handleThemeToggle} className="text-white p-2 rounded hover:bg-blue-700 transition duration-200">
+                        {theme === 'dark' ? '☀️' : '🌙'}
+                    </button>
+                )}
             </div>
 
             {/* Navigation Links */}
-            <ul className="space-y-6">
+            <ul className="space-y-6 mt-4">
                 <li>
+                <ul className="space-y-4 ml-2">
                     <Link to="/" className="block hover:text-blue-200 transition duration-200">
-                    <ul className="space-y-4 ml-2">
-
                         <span className="flex items-center gap-2">
-                            <FiHome size={20} />
-                            {isOpen && 'Home'}
+                            {isOpen ? '🏠 Home' : '🏠'}
                         </span>
-                    </ul>
                     </Link>
+                </ul>
                 </li>
 
                 {token && (
@@ -58,32 +60,28 @@ const AppSidebar = ({ isOpen, toggleSidebar }) => {
                                             <li>
                                                 <Link to="/add-book" className="block hover:text-blue-200 transition duration-200">
                                                     <span className="flex items-center gap-2">
-                                                        <FiBook size={20} />
-                                                        {isOpen && 'Add Book'}
+                                                        {isOpen ? '📖 Add Book' : '📖'}
                                                     </span>
                                                 </Link>
                                             </li>
                                             <li>
                                                 <Link to="/book-copies" className="block hover:text-blue-200 transition duration-200">
                                                     <span className="flex items-center gap-2">
-                                                        <FiBook size={20} />
-                                                        {isOpen && 'Book Copies'}
+                                                        {isOpen ? '📚 Book Copies' : '📚'}
                                                     </span>
                                                 </Link>
                                             </li>
                                             <li>
                                                 <Link to="/categories" className="block hover:text-blue-200 transition duration-200">
                                                     <span className="flex items-center gap-2">
-                                                        <FiBook size={20} />
-                                                        {isOpen && 'Categories'}
+                                                        {isOpen ? '📂 Categories' : '📂'}
                                                     </span>
                                                 </Link>
                                             </li>
                                             <li>
                                                 <Link to="/authors" className="block hover:text-blue-200 transition duration-200">
                                                     <span className="flex items-center gap-2">
-                                                        <FiBook size={20} />
-                                                        {isOpen && 'Authors'}
+                                                        {isOpen ? '🖋️ Authors' : '🖋️'}
                                                     </span>
                                                 </Link>
                                             </li>
@@ -93,8 +91,7 @@ const AppSidebar = ({ isOpen, toggleSidebar }) => {
                                         <li>
                                             <Link to="/add-user" className="block hover:text-blue-200 transition duration-200">
                                                 <span className="flex items-center gap-2">
-                                                    <FiUser size={20} />
-                                                    {isOpen && 'Add User'}
+                                                    {isOpen ? '👤 Add User' : '👤'}
                                                 </span>
                                             </Link>
                                         </li>
@@ -102,16 +99,14 @@ const AppSidebar = ({ isOpen, toggleSidebar }) => {
                                     <li>
                                         <Link to="/books-with-copies" className="block hover:text-blue-200 transition duration-200">
                                             <span className="flex items-center gap-2">
-                                                <FiBook size={20} />
-                                                {isOpen && 'Books with Copies'}
+                                                {isOpen ? '📘 Books with Copies' : '📘'}
                                             </span>
                                         </Link>
                                     </li>
                                     <li>
                                         <Link to="/users" className="block hover:text-blue-200 transition duration-200">
                                             <span className="flex items-center gap-2">
-                                                <FiUser size={20} />
-                                                {isOpen && 'Users'}
+                                                {isOpen ? '👥 Users' : '👥'}
                                             </span>
                                         </Link>
                                     </li>
@@ -127,16 +122,14 @@ const AppSidebar = ({ isOpen, toggleSidebar }) => {
                                     <li>
                                         <Link to="/cart" className="block hover:text-blue-200 transition duration-200">
                                             <span className="flex items-center gap-2">
-                                                <FiShoppingCart size={20} />
-                                                {isOpen && 'Cart'}
+                                                {isOpen ? '🛒 Cart' : '🛒'}
                                             </span>
                                         </Link>
                                     </li>
                                     <li>
                                         <Link to="/payments" className="block hover:text-blue-200 transition duration-200">
                                             <span className="flex items-center gap-2">
-                                                <FiCreditCard size={20} />
-                                                {isOpen && 'Payments'}
+                                                {isOpen ? '💳 Payments' : '💳'}
                                             </span>
                                         </Link>
                                     </li>
@@ -146,10 +139,6 @@ const AppSidebar = ({ isOpen, toggleSidebar }) => {
                     </>
                 )}
             </ul>
-
-            
-
-            
         </aside>
     );
 };

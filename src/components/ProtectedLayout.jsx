@@ -1,5 +1,6 @@
 // src/components/ProtectedLayout.js
 import React, { useState } from 'react';
+import NavbarProfile from './NavbarProfile';
 import AppSidebar from './AppSidebar';
 
 const ProtectedLayout = ({ children }) => {
@@ -9,22 +10,18 @@ const ProtectedLayout = ({ children }) => {
     return (
         <div className="flex min-h-screen bg-gray-100">
             {/* Sidebar */}
-            <div
-                className={`fixed top-0 left-0 h-full transition-all duration-300 ease-in-out ${
-                    isSidebarOpen ? 'w-52' : 'w-20'
-                } bg-blue-700 z-10`}
-            >
                 <AppSidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-            </div>
 
-            {/* Main content */}
-            <main
-                className={`transition-all duration-300 ease-in-out ${
-                    isSidebarOpen ? 'ml-52' : 'ml-10'
-                } flex-1 p-6`}
-            >
-                {children}
-            </main>
+            {/* Main Layout with Navbar and Content */}
+            <div className="flex flex-col flex-1">
+                {/* Navbar with dynamic margin */}
+                <NavbarProfile sidebarOpen={isSidebarOpen} className={`transition-all duration-300 ${isSidebarOpen ? 'ml-52' : 'ml-20'}`} />
+
+                {/* Main content with padding */}
+                <main className="p-6">
+                    {children}
+                </main>
+            </div>
         </div>
     );
 };

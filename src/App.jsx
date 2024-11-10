@@ -25,9 +25,9 @@ import PaymentsListPage from './pages/PaymentManaging/PaymentsListPage';
 import CreatePaymentPage from './pages/PaymentManaging/CreatePaymentPage';
 
 import './index.css';
-import NavbarProfile from './components/NavBarProfile';
 import ProfilePage from './pages/UserProfileManaging/ProfilePage';
 import FavoritesPage from './pages/UserProfileManaging/FavoritesPage';
+import ThemeProvider from './components/ThemeProvider';
 // import FavoritesPage from './pages/UserProfileManaging/FavoritesPage';
 
 const App = () => {
@@ -37,8 +37,8 @@ const App = () => {
   };
 
   return (
+    <ThemeProvider defaultTheme="system">
     <BrowserRouter>
-    <NavbarProfile />
       <Routes>
         <Route path="/signin" element={<SignIn onSignIn={handleSignIn} />} />
         <Route path="/signup" element={<Signup />} />
@@ -209,6 +209,7 @@ const App = () => {
         
       </Routes>
     </BrowserRouter>
+    </ThemeProvider>
   );
 };
 
