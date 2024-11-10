@@ -70,20 +70,41 @@ const BookService = {
     }
   },
 
-
-  advancedSearch: async (filters) => {
+  // Search books by query
+  searchBooks: async (query) => {
     try {
-        const response = await axios.get(`${BASE_URL}/search-advanced`, {
-            headers: getAuthHeader(),
-            params: filters,
-            paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'repeat' }),
-        });
-        return response.data; // Return data instead of trying to set it here
+        const response = await axios.get(`${BASE_URL}/search-basic?q=${query}`);
+        return response.data || []; // Return empty array if data is not defined
     } catch (error) {
-        console.error("Error performing advanced search:", error.response || error);
-        throw error;
+        console.error("Error searching books:", error);
+        return []; // Return empty array on error
     }
 },
+
+
+advancedSearch: async (filters) => {
+  try {
+      const response = await axios.get(`${BASE_URL}/search-advanced`, {
+          headers: getAuthHeader(),
+          params: filters,
+          paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'repeat' }),  // Serialize arrays correctly
+      });
+      return response.data || []; // Return empty array if data is not defined
+  } catch (error) {
+      console.error("Error performing advanced search:", error);
+      return []; // Return empty array on error
+  }
+},
+
+getBooksByCategoryId: async (categoryId) => {
+  try {
+      const response = await axios.get(`${BASE_URL}/category/${categoryId}`, { headers: getAuthHeader() });
+      return response.data || [];
+  } catch (error) {
+      console.error("Error fetching books by category ID:", error);
+      throw error;
+  }
+}
   
 };
 
