@@ -3,6 +3,12 @@ import Select from 'react-select';
 import AuthorService from '../Services/AuthorService/AuthorService';
 import CategoryService from '../Services/CategoryService/CategoryService';
 
+import { Input } from '@/components/ui/input';
+// import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import customSelectStyles from './ui/customSelectStyles';
+
 function AdvancedSearch({ onSearch }) {
     const [filters, setFilters] = useState({
         description: '',
@@ -59,6 +65,8 @@ function AdvancedSearch({ onSearch }) {
         e.preventDefault();
         onSearch(filters);  // Ensure this sends the correct format
     };
+
+          
     
     
     
@@ -66,29 +74,33 @@ function AdvancedSearch({ onSearch }) {
     if (error) return <p className="text-red-500">{error}</p>;
 
     return (
-        <form onSubmit={handleSubmit} className="p-4 bg-gray-100 rounded-lg mb-6">
-            <h2 className="text-2xl font-semibold mb-4">Advanced Search</h2>
-            <div className="grid grid-cols-2 gap-4">
-                <input
+        <form onSubmit={handleSubmit} className="p-4 rounded-lg mb-6 bg-card">
+            <Label>
+                <h2 className="text-xl font-semibold mb-4">Advanced Search</h2>
+            </Label>
+
+            <div className="grid gap-4">
+                <Label>Description</Label>
+                <Input
                     type="text"
                     name="description"
                     placeholder="Description"
                     value={filters.description}
                     onChange={handleChange}
-                    className="p-2 border rounded"
                     disabled={loading}
                 />
-                <input
+
+                <Label>ISBN</Label>
+                <Input
                     type="text"
                     name="isbn"
                     placeholder="ISBN"
                     value={filters.isbn}
                     onChange={handleChange}
-                    className="p-2 border rounded"
                     disabled={loading}
                 />
 
-                {/* Searchable Multi-Select for Authors */}
+                <Label>Authors</Label>
                 <Select
                     name="authorIds"
                     options={authors}
@@ -98,9 +110,11 @@ function AdvancedSearch({ onSearch }) {
                     onChange={handleSelectChange}
                     value={authors.filter(author => filters.authorIds.includes(author.value))}
                     noOptionsMessage={() => loading ? "Loading..." : "No authors available"}
+                    styles={customSelectStyles}
                 />
 
-                {/* Searchable Multi-Select for Categories */}
+                <Label>Categories</Label>
+               
                 <Select
                     name="categoryIds"
                     options={categories}
@@ -110,15 +124,14 @@ function AdvancedSearch({ onSearch }) {
                     onChange={handleSelectChange}
                     value={categories.filter(category => filters.categoryIds.includes(category.value))}
                     noOptionsMessage={() => loading ? "Loading..." : "No categories available"}
+                    styles={customSelectStyles}
+
                 />
             </div>
-            <button 
-                type="submit" 
-                className="mt-4 bg-blue-500 text-white py-2 px-4 rounded" 
-                disabled={loading}
-            >
+
+            <Button type="submit" className="mt-4" disabled={loading}>
                 {loading ? 'Loading...' : 'Search'}
-            </button>
+            </Button>
         </form>
     );
 }

@@ -7,16 +7,22 @@ export default function ThemeProvider({ children, defaultTheme = "system", stora
   const [theme, setTheme] = useState(() => localStorage.getItem(storageKey) || defaultTheme)
 
   useEffect(() => {
-    const root = document.documentElement
-    root.classList.remove("light", "dark")
-
+    const root = document.documentElement;
+    root.classList.remove("light", "dark");
+  
     if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
-      root.classList.add(systemTheme)
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      root.classList.add(systemTheme);
     } else {
-      root.classList.add(theme)
+      root.classList.add(theme);
     }
-  }, [theme])
+  
+    // Обновление цвета фона
+    document.body.style.backgroundColor = getComputedStyle(root).getPropertyValue('--background');
+    document.body.style.color = getComputedStyle(root).getPropertyValue('--foreground');
+  
+  }, [theme]);
+  
 
   const value = {
     theme,

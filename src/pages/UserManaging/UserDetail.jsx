@@ -4,6 +4,11 @@ import { faEdit, faTrashAlt, faUserLock, faUserCheck } from '@fortawesome/free-s
 import UserService from '../../Services/UserManagingService/UserService';
 import { useNavigate } from 'react-router-dom';
 
+import { TableRow, TableCell } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+
+
 const UserDetail = ({ user, userRole, onUserUpdated, onUserDeleted }) => {
   const navigate = useNavigate();
 
@@ -39,41 +44,42 @@ const UserDetail = ({ user, userRole, onUserUpdated, onUserDeleted }) => {
   };
 
   return (
-    <tr className="border-b border-gray-200 hover:bg-gray-50 transition-colors duration-150">
-    <td className="py-3 px-6 text-left font-medium text-gray-700">{user.firstName} {user.lastName}</td>
-    <td className="py-3 px-6 text-left text-gray-600">{user.email}</td>
-    <td className="py-3 px-6 text-left text-gray-600">{user.role}</td>
-    <td className="py-3 px-6 text-center">
-        <span className={`py-1 px-3 rounded-full text-xs font-semibold ${user.accountNonLocked ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-            {user.accountNonLocked ? 'Enabled' : 'Disabled'}
-        </span>
-    </td>
-    <td className="py-3 px-6 text-center">
+    <TableRow className="hover:bg-muted transition-colors duration-150">
+      <TableCell>
+        <span className="font-medium">{user.firstName} {user.lastName}</span>
+      </TableCell>
+      <TableCell>{user.email}</TableCell>
+      <TableCell>{user.role}</TableCell>
+      <TableCell className="text-center">
+        <Badge className={`font-semibold ${user.accountNonLocked ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+          {user.accountNonLocked ? 'Enabled' : 'Disabled'}
+        </Badge>
+      </TableCell>
+      <TableCell className="text-center">
         <div className="flex items-center justify-center space-x-2">
-            {userRole === 'ROLE_ADMIN' && (
-                <>
-                    {user.accountNonLocked ? (
-                        <button onClick={handleDeactivate} className="text-white bg-red-500 hover:bg-red-600 px-3 py-2 rounded-lg shadow-sm transition-all duration-150 ease-in-out">
-                            <FontAwesomeIcon icon={faUserLock} />
-                        </button>
-                    ) : (
-                        <button onClick={handleActivate} className="text-white bg-green-500 hover:bg-green-600 px-3 py-2 rounded-lg shadow-sm transition-all duration-150 ease-in-out">
-                            <FontAwesomeIcon icon={faUserCheck} />
-                        </button>
-                    )}
-                    <button onClick={handleUpdateClick} className="text-blue-500 hover:text-blue-600 px-3 py-2 rounded-lg transition-all duration-150 ease-in-out">
-                        <FontAwesomeIcon icon={faEdit} />
-                    </button>
-                    <button onClick={handleDelete} className="text-red-500 hover:text-red-600 px-3 py-2 rounded-lg transition-all duration-150 ease-in-out">
-                        <FontAwesomeIcon icon={faTrashAlt} />
-                    </button>
-                </>
-            )}
+          {userRole === 'ROLE_ADMIN' && (
+            <>
+              {user.accountNonLocked ? (
+                <Button onClick={handleDeactivate} variant="destructive" size="sm" className="transition-all duration-150 ease-in-out">
+                  <FontAwesomeIcon icon={faUserLock} />
+                </Button>
+              ) : (
+                <Button onClick={handleActivate} variant="success" size="sm" className="transition-all duration-150 ease-in-out">
+                  <FontAwesomeIcon icon={faUserCheck} />
+                </Button>
+              )}
+              <Button onClick={handleUpdateClick} variant="outline" size="sm" className="text-blue-500 hover:text-blue-600 transition-all duration-150 ease-in-out">
+                <FontAwesomeIcon icon={faEdit} />
+              </Button>
+              <Button onClick={handleDelete} variant="destructive" size="sm" className="text-red-500 hover:text-red-600 transition-all duration-150 ease-in-out">
+                <FontAwesomeIcon icon={faTrashAlt} />
+              </Button>
+            </>
+          )}
         </div>
-    </td>
-</tr>
-
+      </TableCell>
+    </TableRow>
   );
-};
+}
 
 export default UserDetail;

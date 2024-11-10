@@ -5,6 +5,13 @@ import AuthorService from '../../Services/AuthorService/AuthorService';
 import CategoryService from '../../Services/CategoryService/CategoryService';
 import { useNavigate } from 'react-router-dom';
 
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import customSelectStyles from '@/components/ui/customSelectStyles';
+
 function AddBook() {
     const [book, setBook] = useState({
         name: '',
@@ -84,101 +91,82 @@ function AddBook() {
     };
 
     return (
-        <div className="max-w-lg mx-auto my-10 p-8 shadow-xl border border-gray-200 rounded-lg bg-white">
-            <h1 className="text-3xl font-semibold text-center text-gray-800 mb-8">Add New Book</h1>
-            <form onSubmit={handleSubmit} className="space-y-6">
-                Book Name
-                <input
-                    className="w-full p-3 border border-gray-300 rounded-md"
-                    type="text"
-                    name="name"
-                    value={book.name}
-                    onChange={handleChange}
-                    placeholder="Book Name"
-                    required
-                />
-                Description
-                <textarea
-                    className="w-full p-3 border border-gray-300 rounded-md"
-                    name="description"
-                    value={book.description}
-                    onChange={handleChange}
-                    placeholder="Description"
-                    required
-                />
-                ISBN
-                <input
-                    className="w-full p-3 border border-gray-300 rounded-md"
-                    type="text"
-                    name="isbn"
-                    value={book.isbn}
-                    onChange={handleChange}
-                    placeholder="ISBN"
-                    required
-                />
+        <Card className="container max-w-lg mx-auto my-10 shadow-lg border rounded-lg">
+            <CardHeader>
+                <CardTitle>Add New Book</CardTitle>
+            </CardHeader>
+            <form onSubmit={handleSubmit}>
+                <CardContent className="space-y-4">
+                    <Label>Book Name</Label>
+                    <Input
+                        type="text"
+                        name="name"
+                        value={book.name}
+                        onChange={handleChange}
+                        placeholder="Book Name"
+                        required
+                    />
 
-                {/* Select Categories with react-select */}
-                Search Category in a list
-                <Select
-                    isMulti
-                    options={categoriesOptions}
-                    value={selectedCategories}
-                    onChange={setSelectedCategories}
-                    placeholder="Select Categories"
-                    className="basic-multi-select"
-                    classNamePrefix="select"
-                />
+                    <Label>Description</Label>
+                    <Textarea
+                        name="description"
+                        value={book.description}
+                        onChange={handleChange}
+                        placeholder="Description"
+                        required
+                    />
 
-                {/* Select Authors with react-select */}
-                Search Author in a list
-                <Select
-                    isMulti
-                    options={authorsOptions}
-                    value={selectedAuthors}
-                    onChange={setSelectedAuthors}
-                    placeholder="Select Authors"
-                    className="basic-multi-select"
-                    classNamePrefix="select"
-                />
+                    <Label>ISBN</Label>
+                    <Input
+                        type="text"
+                        name="isbn"
+                        value={book.isbn}
+                        onChange={handleChange}
+                        placeholder="ISBN"
+                        required
+                    />
 
-                {/* File Uploads */}
-                <input
-                    className="w-full p-3 border border-gray-300 rounded-md"
-                    type="file"
-                    name="previewPdf"
-                    onChange={handleFileChange}
-                />
-                Upload Preview Pdf
-                <input
-                    className="w-full p-3 border border-gray-300 rounded-md"
-                    type="file"
-                    name="fullPdf"
-                    onChange={handleFileChange}
-                />
-                Upload Full Pdf
-                <input
-                    className="w-full p-3 border border-gray-300 rounded-md"
-                    type="file"
-                    name="image"
-                    onChange={handleFileChange}
-                    required
-                />
-                Upload Image
+                    <Label>Search Category in a list</Label>
+                    <Select
+                        isMulti
+                        options={categoriesOptions}
+                        value={selectedCategories}
+                        onChange={setSelectedCategories}
+                        placeholder="Select Categories"
+                        className="basic-multi-select"
+                        classNamePrefix="select"
+                        styles={customSelectStyles}
+                    />
 
-                <button
-                    className="w-full py-3 px-4 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600"
-                    type="submit"
-                >
-                    Add Book
-                </button>
+                    <Label>Search Author in a list</Label>
+                    <Select
+                        isMulti
+                        options={authorsOptions}
+                        value={selectedAuthors}
+                        onChange={setSelectedAuthors}
+                        placeholder="Select Authors"
+                        className="basic-multi-select"
+                        classNamePrefix="select"
+                        styles={customSelectStyles}
+                    />
+
+                    <Label>Upload Preview Pdf</Label>
+                    <Input type="file" name="previewPdf" onChange={handleFileChange} />
+
+                    <Label>Upload Full Pdf</Label>
+                    <Input type="file" name="fullPdf" onChange={handleFileChange} />
+
+                    <Label>Upload Image</Label>
+                    <Input type="file" name="image" onChange={handleFileChange} required />
+                </CardContent>
+                <CardFooter>
+                    <Button type="submit" className="w-full">
+                        Add Book
+                    </Button>
+                </CardFooter>
             </form>
-
-            {error && (
-                <div className="mt-4 text-center text-red-500 font-medium">
-                    {error}
-                </div>
-            )}
-        </div>
+            {error && <div className="text-center text-red-500 font-medium mt-4">{error}</div>}
+        </Card>
     );
 }
 

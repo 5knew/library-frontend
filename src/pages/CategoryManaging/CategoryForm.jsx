@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import CategoryService from '../../Services/CategoryService/CategoryService';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { jwtDecode } from 'jwt-decode';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 
 const CategoryForm = () => {
   const [categories, setCategories] = useState([]);
@@ -76,49 +80,63 @@ const CategoryForm = () => {
   if (error) return <div>{error}</div>;
 
   return (
-    <div className="container mx-auto p-6 max-w-5xl bg-gray-50 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold mb-4">Add or Edit Category</h2>
-      <form onSubmit={handleSubmit} className="mb-6">
-        <input
-          type="text"
-          name="name"
-          value={category.name}
-          onChange={handleChange}
-          placeholder="Category Name"
-          required
-          className="p-2 border border-gray-300 rounded mb-2 w-full"
-        />
-        <button type="submit" className="bg-blue-500 text-white p-2 rounded w-full">Save</button>
-      </form>
+    <Card className="container mx-auto max-w-5xl shadow-lg rounded-lg">
+        <CardHeader>
+            <CardTitle className="text-2xl font-bold">Add or Edit Category</CardTitle>
+        </CardHeader>
+        <form onSubmit={handleSubmit}>
+            <CardContent className="space-y-4">
+                <Label>Category Name</Label>
+                <Input
+                    type="text"
+                    name="name"
+                    value={category.name}
+                    onChange={handleChange}
+                    placeholder="Category Name"
+                    required
+                />
 
-      <input
-        type="text"
-        placeholder="Search categories..."
-        value={searchTerm}
-        onChange={handleSearch}
-        className="p-2 border border-gray-300 rounded mb-4 w-full"
-      />
+                <Button className="w-full mt-4" type="submit">
+                    Save
+                </Button>
+            </CardContent>
+        </form>
 
-      <h3 className="text-xl font-semibold mb-4">Categories List</h3>
-      {filteredCategories.length === 0 ? (
-        <p className="text-gray-500">No category found.</p>
-      ) : (
-        <ul>
-          {filteredCategories.map((cat) => (
-            <li key={cat.id} className="flex items-center justify-between mb-2">
-              <span>{cat.name}</span>
-              {userRole === 'ROLE_LIBRARIAN' && (
-                <div>
-                  <FaEdit onClick={() => setCategory(cat)} className="cursor-pointer text-blue-500 mx-2" />
-                  <FaTrash onClick={() => handleDelete(cat.id)} className="cursor-pointer text-red-500" />
-                </div>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-};
+        <CardContent className="mt-6 space-y-4">
+            <Input
+                type="text"
+                placeholder="Search categories..."
+                value={searchTerm}
+                onChange={handleSearch}
+            />
+
+            <h3 className="text-xl font-semibold">Categories List</h3>
+            {filteredCategories.length === 0 ? (
+                <p className="text-gray-500">No category found.</p>
+            ) : (
+                <ul className="space-y-2">
+                    {filteredCategories.map((cat) => (
+                        <li key={cat.id} className="flex items-center justify-between p-2 rounded-md">
+                            <span>{cat.name}</span>
+                            {userRole === 'ROLE_LIBRARIAN' && (
+                                <div className="flex space-x-2">
+                                    <FaEdit
+                                        onClick={() => setCategory(cat)}
+                                        className="cursor-pointer text-blue-500"
+                                    />
+                                    <FaTrash
+                                        onClick={() => handleDelete(cat.id)}
+                                        className="cursor-pointer text-red-500"
+                                    />
+                                </div>
+                            )}
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </CardContent>
+    </Card>
+);
+}
 
 export default CategoryForm;

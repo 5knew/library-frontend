@@ -1,40 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { jwtDecode } from 'jwt-decode'
-import { Pencil, Trash2, Copy, BookOpen, Info } from 'lucide-react'
 import BookService from '../../Services/BookService/BookService'
 import AdvancedSearch from '../../components/AdvancedSearch'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Separator } from "@/components/ui/separator"
-import { toast } from "@/hooks/use-toast"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import CategoryService from '@/Services/CategoryService/CategoryService'
+
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Pencil, Trash2, Copy } from 'lucide-react';
 
 function Books() {
     const [books, setBooks] = useState([])
@@ -156,9 +134,11 @@ function Books() {
     };
 
 
+
+
     return (
         <div className="container mx-auto p-6 space-y-8">
-            <h1 className="text-3xl font-bold text-center mb-8">Books</h1>
+            <Label>Books</Label>
 
             <div className="flex justify-between items-center">
                 <form onSubmit={handleBasicSearch} className="flex gap-2">
@@ -170,6 +150,7 @@ function Books() {
                     />
                     <Button>Search</Button>
                 </form>
+                
                 {/* Category Filter */}
                 <Select onValueChange={handleCategoryChange}>
                     <SelectTrigger className="w-[180px]">
@@ -184,13 +165,11 @@ function Books() {
                         ))}
                     </SelectContent>
                 </Select>
-
             </div>
 
             <Button
                 onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
                 variant="outline"
-                className="mx-auto block"
             >
                 {showAdvancedSearch ? "Hide Advanced Search" : "Show Advanced Search"}
             </Button>
@@ -203,7 +182,6 @@ function Books() {
                 <Table>
                     <TableHeader>
                         <TableRow>
-
                             <TableHead>Image</TableHead>
                             <TableHead>Title</TableHead>
                             <TableHead>Description</TableHead>
@@ -222,7 +200,7 @@ function Books() {
                                             <img 
                                                 src={book.photos[0]} 
                                                 alt={`Book ${book.name}`} 
-                                                className="h-16 w-12 rounded-md object-cover mr-4" // Adjusted size to fit better in table cell
+                                                className="h-16 w-12 rounded-md object-cover mr-4"
                                             />
                                         )}
                                         <span>{book.name}</span>
@@ -285,7 +263,7 @@ function Books() {
                                                 <Tooltip>
                                                     <TooltipTrigger asChild>
                                                         <Button variant="outline" size="sm" onClick={() => copyToClipboard(book.fullPdf)}>
-                                                            <Copy className="h-4 w-4" />Full PDF
+                                                            <Copy className="h-4 w-4" /> Full PDF
                                                         </Button>
                                                     </TooltipTrigger>
                                                     <TooltipContent>
@@ -302,7 +280,7 @@ function Books() {
                 </Table>
             )}
         </div>
-    )
+    );
 }
 
-export default Books
+export default Books;

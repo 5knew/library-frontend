@@ -8,7 +8,7 @@ const ProtectedLayout = ({ children }) => {
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
     return (
-        <div className="flex min-h-screen bg-gray-100">
+        <div className="flex min-h-screen">
             {/* Sidebar */}
                 <AppSidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 

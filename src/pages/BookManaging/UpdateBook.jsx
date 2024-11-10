@@ -3,6 +3,11 @@ import BookService from '../../Services/BookService/BookService';
 import AuthorService from '../../Services/AuthorService/AuthorService';
 import CategoryService from '../../Services/CategoryService/CategoryService';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 function UpdateBook() {
     const [book, setBook] = useState({
@@ -139,142 +144,146 @@ function UpdateBook() {
     
 
     return (
-        <div className="max-w-lg mx-auto my-10 p-8 shadow-lg border border-gray-200 rounded-lg bg-white">
-            <h1 className="text-3xl font-semibold text-center text-gray-800 mb-8">Update Book</h1>
+        <Card>
+            <CardHeader>
+                <CardTitle>Update Book</CardTitle>
+            </CardHeader>
+            <form onSubmit={handleSubmit}>
+                <CardContent>
+                    <Label>Book Name</Label>
+                    <Input
+                        type="text"
+                        name="name"
+                        value={book.name}
+                        onChange={handleChange}
+                        placeholder="Book Name"
+                        required
+                    />
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-                Book Name
-                <input 
-                    className="w-full p-3 border border-gray-300 rounded-md" 
-                    type="text" 
-                    name="name" 
-                    value={book.name} 
-                    onChange={handleChange} 
-                    placeholder="Book Name" 
-                    required 
-                />
-                Description
-                <textarea 
-                    className="w-full p-3 border border-gray-300 rounded-md" 
-                    name="description" 
-                    value={book.description} 
-                    onChange={handleChange} 
-                    placeholder="Description" 
-                    required 
-                />
-                ISBN
-                <input 
-                    className="w-full p-3 border border-gray-300 rounded-md" 
-                    type="text" 
-                    name="isbn" 
-                    value={book.isbn} 
-                    onChange={handleChange} 
-                    placeholder="ISBN" 
-                    required 
-                />
+                    <Label>Description</Label>
+                    <Textarea
+                        name="description"
+                        value={book.description}
+                        onChange={handleChange}
+                        placeholder="Description"
+                        required
+                    />
 
-                {/* Category Selection with Search */}
-                Search category in a list
-                <input
-                    className="w-full p-3 border border-gray-300 rounded-md"
-                    type="text"
-                    placeholder="Search Category"
-                    onChange={handleCategorySearch}
-                />
-                <div className="border border-gray-300 rounded-md p-3">
-                    {filteredCategories.map(category => (
-                        <div
-                            key={category.id}
-                            onClick={() => handleCategorySelect(category.id)}
-                            className="cursor-pointer p-1 hover:bg-gray-200"
-                        >
-                            {category.name}
-                        </div>
-                    ))}
-                </div>
+                    <Label>ISBN</Label>
+                    <Input
+                        type="text"
+                        name="isbn"
+                        value={book.isbn}
+                        onChange={handleChange}
+                        placeholder="ISBN"
+                        required
+                    />
 
-                {/* Display selected categories */}
-                <div className="flex flex-wrap gap-2 mt-2">
-                    {selectedCategories.map(categoryId => {
-                        const category = allCategories.find(c => c.id === categoryId);
-                        return (
-                            <span
-                                key={categoryId}
-                                className="bg-green-200 text-green-700 p-2 rounded-md"
-                                onClick={() => removeCategory(categoryId)}
+                    <Label>Search Category in a List</Label>
+                    <Input
+                        type="text"
+                        placeholder="Search Category"
+                        onChange={handleCategorySearch}
+                    />
+                    <div style={{ border: '1px solid #ccc', borderRadius: '4px', padding: '8px' }}>
+                        {filteredCategories.map(category => (
+                            <div
+                                key={category.id}
+                                onClick={() => handleCategorySelect(category.id)}
+                                style={{
+                                    cursor: 'pointer',
+                                    padding: '4px',
+                                    backgroundColor: '#f0f0f0',
+                                    borderRadius: '4px',
+                                    marginBottom: '4px'
+                                }}
                             >
-                                {category?.name} ✕
-                            </span>
-                        );
-                    })}
-                </div>
+                                {category.name}
+                            </div>
+                        ))}
+                    </div>
 
-                {/* Author Multi-Selection with Search */}
-                Search Author in a list
-                <input
-                    className="w-full p-3 border border-gray-300 rounded-md"
-                    type="text"
-                    placeholder="Search Authors"
-                    onChange={handleAuthorSearch}
-                />
-                <div className="border border-gray-300 rounded-md p-3">
-                    {filteredAuthors.map(author => (
-                        <div
-                            key={author.id}
-                            onClick={() => handleAuthorSelect(author.id)}
-                            className="cursor-pointer p-1 hover:bg-gray-200"
-                        >
-                            {author.name}
-                        </div>
-                    ))}
-                </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
+                        {selectedCategories.map(categoryId => {
+                            const category = allCategories.find(c => c.id === categoryId);
+                            return (
+                                <span
+                                    key={categoryId}
+                                    style={{
+                                        backgroundColor: '#d4edda',
+                                        color: '#155724',
+                                        padding: '4px 8px',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer'
+                                    }}
+                                    onClick={() => removeCategory(categoryId)}
+                                >
+                                    {category?.name} ✕
+                                </span>
+                            );
+                        })}
+                    </div>
 
-                {/* Display selected authors */}
-                <div className="flex flex-wrap gap-2 mt-2">
-                    {selectedAuthors.map(authorId => {
-                        const author = allAuthors.find(a => a.id === authorId);
-                        return (
-                            <span
-                                key={authorId}
-                                className="bg-blue-200 text-blue-700 p-2 rounded-md"
-                                onClick={() => removeAuthor(authorId)}
+                    <Label>Search Author in a List</Label>
+                    <Input
+                        type="text"
+                        placeholder="Search Authors"
+                        onChange={handleAuthorSearch}
+                    />
+                    <div style={{ border: '1px solid #ccc', borderRadius: '4px', padding: '8px' }}>
+                        {filteredAuthors.map(author => (
+                            <div
+                                key={author.id}
+                                onClick={() => handleAuthorSelect(author.id)}
+                                style={{
+                                    cursor: 'pointer',
+                                    padding: '4px',
+                                    backgroundColor: '#f0f0f0',
+                                    borderRadius: '4px',
+                                    marginBottom: '4px'
+                                }}
                             >
-                                {author?.name} ✕
-                            </span>
-                        );
-                    })}
-                </div>
+                                {author.name}
+                            </div>
+                        ))}
+                    </div>
 
-                {/* File Uploads */}
-                <input
-                    className="w-full p-3 border border-gray-300 rounded-md"
-                    type="file"
-                    name="previewPdf"
-                    onChange={handleFileChange}
-                />
-                Upload preview pdf
-                <input
-                    className="w-full p-3 border border-gray-300 rounded-md"
-                    type="file"
-                    name="fullPdf"
-                    onChange={handleFileChange}
-                />
-                <input
-                    className="w-full p-3 border border-gray-300 rounded-md"
-                    type="file"
-                    name="image"
-                    onChange={handleFileChange}
-                />
-                Upload image
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
+                        {selectedAuthors.map(authorId => {
+                            const author = allAuthors.find(a => a.id === authorId);
+                            return (
+                                <span
+                                    key={authorId}
+                                    style={{
+                                        backgroundColor: '#cce5ff',
+                                        color: '#004085',
+                                        padding: '4px 8px',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer'
+                                    }}
+                                    onClick={() => removeAuthor(authorId)}
+                                >
+                                    {author?.name} ✕
+                                </span>
+                            );
+                        })}
+                    </div>
 
-                <button
-                    className="w-full py-3 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600"
-                    type="submit"
-                >
-                    Update Book
-                </button>
+                    <Label>Upload Preview PDF</Label>
+                    <Input type="file" name="previewPdf" onChange={handleFileChange} />
+
+                    <Label>Upload Full PDF</Label>
+                    <Input type="file" name="fullPdf" onChange={handleFileChange} />
+
+                    <Label>Upload Image</Label>
+                    <Input type="file" name="image" onChange={handleFileChange} required />
+                </CardContent>
+
+                <CardFooter>
+                    <Button type="submit">Update Book</Button>
+                </CardFooter>
             </form>
-        </div>
+        </Card>
     );
 }
 
