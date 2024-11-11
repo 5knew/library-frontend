@@ -96,7 +96,7 @@ const CartPage = () => {
                                 <div>
                                     <h2 className="text-xl font-semibold">{item.bookCopy.book.name}</h2>
                                     <p className="text-gray-600"><strong>Authors:</strong> {item.bookCopy.book.authors.map(author => author.name).join(', ')}</p>
-                                    <p className="text-gray-600"><strong>Price:</strong> ${item.bookCopy.price}</p>
+                                    <p className="text-gray-600"><strong>Price:</strong> {item.bookCopy.price} tg </p>
                                     <p className="text-gray-600"><strong>Condition:</strong> {item.bookCopy.condition}</p>
                                 </div>
                                 <button 
@@ -109,7 +109,7 @@ const CartPage = () => {
                         ))}
                     </div>
                     <div className="mt-6 text-xl font-semibold text-center">
-                        Total Price: ${totalPrice}
+                        Total Price: {totalPrice} tg
                     </div>
                     <button 
                         onClick={handleProceedToPayment} 

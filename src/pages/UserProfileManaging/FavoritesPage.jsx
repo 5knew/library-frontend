@@ -194,7 +194,7 @@ function FavoritesPage() {
                                 <TableRow key={copy.id}>
                                   <TableCell>{new Date(copy.publicationDate).toLocaleDateString()}</TableCell>
                                   <TableCell>{copy.language}</TableCell>
-                                  <TableCell>${copy.price}</TableCell>
+                                  <TableCell>{copy.price} tg</TableCell>
                                   <TableCell>
                                     <Button variant="outline" onClick={() => handleAddToCart(copy.id)}>
                                       <FontAwesomeIcon icon={faCartPlus} /> Add to Cart

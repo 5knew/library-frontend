@@ -1,7 +1,7 @@
 // src/components/AppSidebar.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Home, BookOpen, Users, Folder, Edit3,Edit2,  Clipboard, ShoppingCart, CreditCard, User, Heart, LogOut } from "lucide-react";
+import { Home, BookOpen, Users, Folder, Edit3, Edit2, ListCheck, Clipboard, ShoppingCart, CreditCard, User, Heart, LogOut, BookAIcon } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -18,14 +18,13 @@ import {
 // Menu items for different user roles
 const items = [
   { title: "Home", url: "/", icon: Home },
-  { title: "Books", url: "/books-with-copies", icon: BookOpen },
-  { title: "Create/Edit Authors", url: "/authors", icon: Clipboard },
-  { title: "Cart", url: "/cart", icon: ShoppingCart },
 ];
 
 const itemLibrary = [
   { title: "Add Book", url: "/add-book", icon: Edit3 },
   { title: "Add Book Instances", url: "/add-book-copy", icon: Edit2 },
+  { title: "Books List", url: "/", icon: BookAIcon },
+  { title: "Book Instances List", url: "/book-copies", icon: ListCheck },
   { title: "Users", url: "/users", icon: Users },
   { title: "Create/Edit Categories", url: "/categories", icon: Folder },
   { title: "Create/Edit Authors", url: "/authors", icon: Clipboard },

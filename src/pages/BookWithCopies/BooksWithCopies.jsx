@@ -11,6 +11,10 @@ import { CartItemService } from '@/Services/CartItemService/CartItemService';
 import { FaHeart, FaChevronDown, FaChevronUp, FaCartPlus } from 'react-icons/fa';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Label } from '@/components/ui/label';
 
 function BooksWithCopies() {
     const [books, setBooks] = useState([]);
@@ -43,16 +47,19 @@ function BooksWithCopies() {
         try {
             const booksData = await BookService.getAllBooks();
             const bookCopiesData = await BookCopyService.getAllBookCopies();
+            console.log('booksData: ', booksData);
+            console.log('bookCopiesData: ', bookCopiesData);
             
             const booksArray = Array.isArray(booksData) ? booksData : [];
             const copiesArray = Array.isArray(bookCopiesData) ? bookCopiesData : [];
+
+            console.log('Books array: ', booksArray);
+            console.log('Books Instances array: ', copiesArray);
             
             const booksWithCopies = booksArray.map((book) => ({
                 ...book,
                 copies: copiesArray.filter((copy) => copy.book?.id === book.id),
             }));
-            
-            console.log("Books with copies:", booksWithCopies); // Вывод книг и их копий
             
             setBooks(booksWithCopies);
         } catch (error) {
@@ -69,9 +76,9 @@ function BooksWithCopies() {
         
         try {
             const cartItemData = {
-                userId,  // From the state, set when the component loads
-                bookCopyId: copyId,  // Passed in when the button is clicked
-                quantity: 1  // Default quantity, can be adjusted if needed
+                userId,
+                bookCopyId: copyId,
+                quantity: 1
             };
             
             await CartItemService.createCartItem(cartItemData);
@@ -110,29 +117,35 @@ function BooksWithCopies() {
             let booksWithCopies;
     
             if (isAndSearch) {
-                // "AND" Logic: Only include books with matching copies
-                booksWithCopies = booksData.map(book => {
-                    const matchingCopies = bookCopiesData.filter(copy => copy.book?.id === book.id);
-                    return matchingCopies.length > 0 ? { ...book, copies: matchingCopies } : null;
-                }).filter(Boolean); // Remove null entries for books with no matching copies
-            } else {
-                // "OR" Logic: Include books even if no copies match, and vice versa
-                booksWithCopies = booksData.map(book => ({
+                // "OR" Logic: Include books even if no copies match and vice versa
+                booksWithCopies = booksData.map((book) => ({
                     ...book,
-                    copies: bookCopiesData.filter(copy => copy.book?.id === book.id)
+                    copies: bookCopiesData.filter((copy) => copy.book?.id === book.id)
                 }));
     
-                // Add copies without matching books if not already included
-                const booksWithIds = new Set(booksWithCopies.map(book => book.id));
+                // Include additional book copies without matching books
+                const bookIds = new Set(booksWithCopies.map((book) => book.id));
                 const additionalCopies = bookCopiesData
-                    .filter(copy => !booksWithIds.has(copy.book?.id))
-                    .map(copy => ({
+                    .filter((copy) => !bookIds.has(copy.book?.id))
+                    .map((copy) => ({
                         ...copy.book,
-                        copies: [copy],
+                        copies: [copy]
                     }));
                 
+                // Merge all results
                 booksWithCopies = [...booksWithCopies, ...additionalCopies];
+                
+            } else {
+                // "AND" Logic: Only include books with matching copies
+                booksWithCopies = booksData.map((book) => {
+                    const matchingCopies = bookCopiesData.filter((copy) => copy.book?.id === book.id);
+                    return matchingCopies.length > 0 ? { ...book, copies: matchingCopies } : null;
+                }).filter(Boolean); // Remove null entries for books without matching copies
+                
             }
+    
+            // Log for debugging purposes
+            console.log("Books with copies after search:", booksWithCopies);
     
             setBooks(booksWithCopies);
         } catch (error) {
@@ -140,87 +153,100 @@ function BooksWithCopies() {
         }
     };
     
+    
 
     return (
-        <div className="w-full p-8 bg-gray-50 rounded-lg shadow-lg mx-auto">
-            <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">Books and its Instances</h1>
+        <div className="container mx-auto p-6 max-w-5xl">
+          <Label asChild>
+            <h1 className="text-xl font-extrabold text-center my-10">Books and its Instances</h1>
+          </Label>
+          <AdvancedSearchBookWithCopies onSearch={handleAdvancedSearch} />
+          
+          {books.length > 0 ? (
+            books.map((book) => (
+              <Card key={book.id} className="mb-6 shadow-lg transition">
+                <div className="flex flex-col sm:flex-row items-start">
+                  {book.photos && book.photos.length > 0 && (
+                    <img
+                      src={book.photos[0]}
+                      alt={`Book ${book.name}`}
+                      className="rounded-lg object-cover mb-4 sm:mb-0 sm:mr-6"
+                      style={{
+                        width: '12rem',
+                        height: '16rem',
+                        border: '2px solid #ccc',
+                        backgroundColor: '#f8f9fa'
+                      }}
+                    />
+                  )}
 
-            {/* Advanced Search Form */}
-            <AdvancedSearchBookWithCopies onSearch={handleAdvancedSearch} />
-
-            {books.length > 0 ? (
-                books.map(book => (
-                    <div key={book.id} className="mb-6 p-4 bg-white rounded-lg shadow-lg border border-gray-200">
-                        <div className="flex justify-between items-center">
-                            <h3 className="text-2xl font-semibold text-gray-800">{book.name}</h3>
-                            <div className="flex items-center">
-                                {/* Favorite Icon */}
-                                <button onClick={() => handleFavoriteToggle(book.id)} className="text-red-500 mr-4">
-                                    <FaHeart style={{ color: favoriteBookIds.includes(book.id) ? 'red' : 'gray' }} />
-                                </button>
-                                {/* Expand/Collapse Icon */}
-                                <button onClick={() => toggleBookExpansion(book.id)} className="text-gray-500 hover:text-blue-500">
-                                    {expandedBookId === book.id ? <FaChevronUp /> : <FaChevronDown />}
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Book Details */}
-                        <div className="flex mt-4">
-                            <div>
-                                {book.categories && book.categories.length > 0 && (
-                                    <p className="text-lg text-gray-600 mb-2">
-                                        <strong>Categories:</strong> {book.categories.map((category, index) => (
-                                            <span key={index}>{category.name}{index < book.categories.length - 1 ? ', ' : ''}</span>
-                                        ))}
-                                    </p>
-                                )}
-                                <p className="text-lg text-gray-600 mb-2"><strong>Authors:</strong> {book.authors?.map(author => author.name).join(', ')}</p>
-                                <p className="text-lg text-gray-600 mb-2"><strong>ISBN:</strong> {book.isbn}</p>
-                                <p className="text-lg text-gray-600 mb-4"><strong>Description:</strong> {book.description}</p>
-                            </div>
-                        </div>
-
-                        {/* Book Copies */}
-                        {expandedBookId === book.id && (
-                            <div className="mt-4">
-                                <h4 className="text-xl font-semibold mb-2">Copies</h4>
-                                {book.copies.length > 0 ? (
-                                    <table className="w-full table-auto bg-white rounded-lg shadow-md">
-                                        <thead className="bg-blue-500 text-white">
-                                            <tr>
-                                                
-                                                <th className="p-4 text-left">Publication Date</th>
-                                                <th className="p-4 text-left">Language</th>
-                                                <th className="p-4 text-left">Price</th>
-                                                <th className="p-4 text-center">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {book.copies.map(copy => (
-                                                <tr key={copy.id} className="border-b hover:bg-gray-100">
-                                                    <td className="p-4">{new Date(copy.publicationDate).toLocaleDateString()}</td>
-                                                    <td className="p-4">{copy.language}</td>
-                                                    <td className="p-4">{copy.price} тг</td>
-                                                    <td className="p-4 text-center">
-                                                        <Button onClick={() => handleAddToCart(copy.id)} className="bg-yellow-500 text-white py-1 px-3 rounded-md hover:bg-yellow-600 flex items-center gap-2">
-                                                            <FaCartPlus /> Add to Cart
-                                                        </Button>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                ) : (
-                                    <p className="text-gray-500 mt-2">No copies available for this book.</p>
-                                )}
-                            </div>
-                        )}
+                  <CardContent className="flex-grow">
+                    <div className="flex justify-between items-center mb-2">
+                      <CardHeader>
+                        <CardTitle>{book.name}</CardTitle>
+                      </CardHeader>
+                      <div className="flex items-center">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button onClick={() => handleFavoriteToggle(book.id)} variant="link">
+                                <FontAwesomeIcon icon={faHeart} color={favoriteBookIds.includes(book.id) ? 'red' : 'gray'} />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>{favoriteBookIds.includes(book.id) ? 'Remove from Favorites' : 'Add to Favorites'}</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <Button onClick={() => toggleBookExpansion(book.id)} variant="link">
+                          <FontAwesomeIcon icon={expandedBookId === book.id ? faChevronUp : faChevronDown} />
+                        </Button>
+                      </div>
                     </div>
-                ))
-            ) : (
-                <p className="text-center text-gray-500 mt-6">No books found.</p>
-            )}
+    
+                    <p><strong>Authors:</strong> {book.authors?.map((author) => author.name).join(', ')}</p>
+                    <p><strong>Categories:</strong> {book.categories?.map((category) => category.name).join(', ')}</p>
+                    <p><strong>ISBN:</strong> {book.isbn}</p>
+                    <p><strong>Description:</strong> {book.description}</p>
+                    
+                    {expandedBookId === book.id && (
+                      <div className="mt-6">
+                        <h4>BookInstance Details</h4>
+                        {book.copies && book.copies.length > 0 ? (
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>Publication Date</TableHead>
+                                <TableHead>Language</TableHead>
+                                <TableHead>Price</TableHead>
+                                <TableHead>Actions</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {book.copies.map((copy) => (
+                                <TableRow key={copy.id}>
+                                  <TableCell>{new Date(copy.publicationDate).toLocaleDateString()}</TableCell>
+                                  <TableCell>{copy.language}</TableCell>
+                                  <TableCell>{copy.price} tg</TableCell>
+                                  <TableCell>
+                                    <Button variant="outline" onClick={() => handleAddToCart(copy.id)}>
+                                      <FontAwesomeIcon icon={faCartPlus} /> Add to Cart
+                                    </Button>
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        ) : (
+                          <p>No copies available for this book.</p>
+                        )}
+                      </div>
+                    )}
+                  </CardContent>
+                </div>
+              </Card>
+            ))
+          ) : (
+            <p>No books found.</p>
+          )}
         </div>
     );
 }

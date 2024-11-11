@@ -50,10 +50,17 @@ const getPaymentByOrderId = (orderId) => {
 };
 
 // Get all payments
-const getAllPayments = () => {
-    return axios.get(BASE_URL, { headers: getAuthHeader() })
-        .catch(error => console.error("Error fetching all payments:", error));
+const getAllPayments = async () => {
+    try {
+        const response = await axios.get(BASE_URL, { headers: getAuthHeader() });
+        console.log("Payments response:", response.data);
+        return response.data;  // Ensure this matches the expected structure
+    } catch (error) {
+        console.error("Error fetching all payments:", error);
+        throw error;
+    }
 };
+
 
 // Update payment status
 const updatePaymentStatus = (id, paymentStatus) => {

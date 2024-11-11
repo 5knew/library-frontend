@@ -18,9 +18,14 @@ function BookCopyList() {
         endDate: '',
     });
     const navigate = useNavigate();
+    const [userRole, setUserRole] = useState('')
 
     useEffect(() => {
         fetchAllBookCopies();
+        role = localStorage.getItem('userRole');
+        if(role){
+            setUserRole(role);
+        }
     }, []);
 
     const fetchAllBookCopies = async () => {
@@ -105,7 +110,7 @@ function BookCopyList() {
                         {bookCopies.length > 0 ? bookCopies.map((copy) => (
                             <TableRow key={copy.id} className="border-b hover:bg-gray-100 transition">
                                 <TableCell className="p-4">{copy.book?.name || 'N/A'}</TableCell>
-                                <TableCell className="p-4">{copy.price} тг</TableCell>
+                                <TableCell className="p-4">{copy.price} tg</TableCell>
                                 <TableCell className="p-4">{new Date(copy.publicationDate).toLocaleDateString()}</TableCell>
                                 <TableCell className="p-4">{copy.language || 'N/A'}</TableCell>
                                 <TableCell className="p-4">
