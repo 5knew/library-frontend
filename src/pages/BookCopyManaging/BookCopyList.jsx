@@ -6,6 +6,7 @@ import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from "@/components/ui/table";
+import { jwtDecode } from 'jwt-decode';
 
 
 function BookCopyList() {
@@ -21,11 +22,16 @@ function BookCopyList() {
     const [userRole, setUserRole] = useState('')
 
     useEffect(() => {
-        fetchAllBookCopies();
-        role = localStorage.getItem('userRole');
-        if(role){
-            setUserRole(role);
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const decodedToken = jwtDecode(token);
+                setUserRole(decodedToken.role);
+            } catch (error) {
+                console.error("Invalid token", error);
+            }
         }
+        fetchAllBookCopies();
     }, []);
 
     const fetchAllBookCopies = async () => {

@@ -14,6 +14,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { jwtDecode } from 'jwt-decode';
+
 
 // Menu items for different user roles
 const items = [
@@ -57,12 +59,19 @@ const itemUnauthorized = [
 export default function AppSidebar() {
   const [userRole, setUserRole] = useState(null);
   const navigate = useNavigate();
+  
 
-  // Fetch user role from localStorage
   useEffect(() => {
-    const role = localStorage.getItem('userRole');
-    setUserRole(role); // Set the user role from localStorage
-  }, []); // Only run on component mount
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setUserRole(decoded.role);
+      } catch (error) {
+        console.error("Error decoding JWT token:", error);
+      }
+    }
+  }, []);
 
   // Handle Logout
   const handleLogout = () => {

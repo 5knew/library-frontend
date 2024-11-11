@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Select from 'react-select';
 import { BookCopyService } from '../../Services/BookCopyService/BookCopyService';
 import BookService from '../../Services/BookService/BookService';
+
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 function AddBookCopy() {
     const [bookCopy, setBookCopy] = useState({
@@ -11,7 +18,6 @@ function AddBookCopy() {
         fullPdf: null
     });
     const [books, setBooks] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         async function fetchBooks() {
@@ -34,111 +40,111 @@ function AddBookCopy() {
         setBookCopy({ ...bookCopy, fullPdf: e.target.files[0] });
     };
 
+    const handleBookSelect = (selectedOption) => {
+        setBookCopy({ ...bookCopy, bookId: selectedOption ? selectedOption.value : '' });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         const formData = new FormData();
-        formData.append('bookId', bookCopy.bookId);  // Correctly add bookId here
+        formData.append('bookId', bookCopy.bookId);
         formData.append('price', bookCopy.price);
         formData.append('publicationDate', bookCopy.publicationDate);
         formData.append('language', bookCopy.language);
         if (bookCopy.fullPdf) {
-            formData.append('fullPdf', bookCopy.fullPdf);  // Use 'fullPdf' as key
+            formData.append('fullPdf', bookCopy.fullPdf);
         }
     
         try {
             await BookCopyService.createBookCopy(formData);
             alert('Book copy added successfully');
+            navigate('/book-copies');
         } catch (error) {
+            alert('Error adding book copy: ', error);
             console.error('Error adding book copy:', error);
         }
     };
-    
 
-    // Filter books based on search term
-    const filteredBooks = books.filter(book =>
-        book.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // Convert books to options for react-select
+    const bookOptions = books.map(book => ({
+        value: book.id,
+        label: book.name
+    }));
 
     return (
-        <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold mb-4 text-center">Add Book Copy</h2>
+        <Card className="max-w-md mx-auto mt-10">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-center">Add Book Copy</CardTitle>
+          </CardHeader>
+          <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-                
-                {/* Searchable Dropdown */}
-                Search for a book
-                <div className="relative">
-                    <input
-                        type="text"
-                        className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        placeholder="Search for a book..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                
-                    <select
-                        name="bookId"
-                        value={bookCopy.bookId}
-                        onChange={handleChange}
-                        required
-                        className="w-full mt-1 p-2 border border-gray-300 rounded-md bg-white focus:outline-none"
-                    >
-                        <option value="">Select Book</option>
-                        {filteredBooks.map(book => (
-                            <option key={book.id} value={book.id}>
-                                {book.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                Price
-                <input
-                    type="number"
-                    name="price"
-                    value={bookCopy.price}
-                    onChange={handleChange}
-                    placeholder="Price"
-                    required
-                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              <div className="space-y-2">
+                <Label htmlFor="book">Select a book</Label>
+                <Select
+                    options={bookOptions}
+                    onChange={handleBookSelect}
+                    value={bookOptions.find(option => option.value === bookCopy.bookId) || null}
+                    placeholder="Search and select a book..."
+                    isClearable
                 />
-                Publication Date
-                <input
-                    type="date"
-                    name="publicationDate"
-                    value={bookCopy.publicationDate}
-                    onChange={handleChange}
-                    placeholder="Publication Date"
-                    required
-                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              </div>
+    
+              <div className="space-y-2">
+                <Label htmlFor="price">Price</Label>
+                <Input
+                  id="price"
+                  type="number"
+                  name="price"
+                  value={bookCopy.price}
+                  onChange={handleChange}
+                  placeholder="Price"
+                  required
                 />
-                Language of pdf
-                <input
-                    type="text"
-                    name="language"
-                    value={bookCopy.language}
-                    onChange={handleChange}
-                    placeholder="Language"
-                    required
-                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              </div>
+    
+              <div className="space-y-2">
+                <Label htmlFor="publicationDate">Publication Date</Label>
+                <Input
+                  id="publicationDate"
+                  type="date"
+                  name="publicationDate"
+                  value={bookCopy.publicationDate}
+                  onChange={handleChange}
+                  required
                 />
-
-                {/* File Upload for Full PDF */}
-                <input
-                    type="file"
-                    name="fullPdf"
-                    onChange={handleFileChange}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              </div>
+    
+              <div className="space-y-2">
+                <Label htmlFor="language">Language of PDF</Label>
+                <Input
+                  id="language"
+                  type="text"
+                  name="language"
+                  value={bookCopy.language}
+                  onChange={handleChange}
+                  placeholder="Language"
+                  required
                 />
-                Upload full of Pdf
-
-                <button
-                    type="submit"
-                    className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                >
-                    Add Book Copy
-                </button>
+              </div>
+    
+              <div className="space-y-2">
+                <Label htmlFor="fullPdf">Upload full PDF</Label>
+                <Input
+                  id="fullPdf"
+                  type="file"
+                  name="fullPdf"
+                  onChange={handleFileChange}
+                  accept=".pdf"
+                />
+              </div>
+    
+              <Button type="submit" className="w-full">
+                Add Book Copy
+              </Button>
             </form>
-        </div>
-    );
+          </CardContent>
+        </Card>
+    )
 }
 
 export default AddBookCopy;
