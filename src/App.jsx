@@ -28,6 +28,8 @@ import './index.css';
 import ProfilePage from './pages/UserProfileManaging/ProfilePage';
 import FavoritesPage from './pages/UserProfileManaging/FavoritesPage';
 import ThemeProvider from './components/ThemeProvider';
+import PaymentSuccess from './pages/PaymentManaging/PaymentSuccess';
+import PaymentFailure from './pages/PaymentManaging/PaymentFailure';
 
 const App = () => {
   const handleSignIn = (token, refreshToken) => {
@@ -66,6 +68,8 @@ const App = () => {
             <Route path="/create-payment" element={<ProtectedRoute acceptedRoles={['ROLE_LIBRARIAN', 'ROLE_ADMIN', 'ROLE_STUDENT']}><ProtectedLayout><CreatePaymentPage /></ProtectedLayout></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute acceptedRoles={['ROLE_ADMIN', 'ROLE_LIBRARIAN', 'ROLE_STUDENT']}><ProtectedLayout><ProfilePage /></ProtectedLayout></ProtectedRoute>} />
             <Route path="/favorites" element={<ProtectedRoute acceptedRoles={['ROLE_ADMIN', 'ROLE_LIBRARIAN', 'ROLE_STUDENT']}><ProtectedLayout><FavoritesPage /></ProtectedLayout></ProtectedRoute>} />
+            <Route path="/payment/success" element={<ProtectedRoute acceptedRoles={['ROLE_ADMIN', 'ROLE_LIBRARIAN', 'ROLE_STUDENT']}><ProtectedLayout><PaymentSuccess /></ProtectedLayout></ProtectedRoute>} />
+            <Route path="/payment/failure" element={<ProtectedRoute acceptedRoles={['ROLE_ADMIN', 'ROLE_LIBRARIAN', 'ROLE_STUDENT']}><ProtectedLayout><PaymentFailure /></ProtectedLayout></ProtectedRoute>} />
           </Routes>
         </BrowserRouter>
     </ThemeProvider>

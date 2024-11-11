@@ -57,36 +57,30 @@ const CartPage = () => {
     const handleProceedToPayment = async () => {
         try {
             const cartItemIds = cartItems.map(item => item.id);
-
-            // Step 1: Create Order
             const orderResponse = await OrderService.createOrder(userId, cartItemIds);
-
+    
             if (orderResponse.status === 201 && orderResponse.data) {
                 const orderId = orderResponse.data.id;
-
-                // Step 2: Process Payment via PayPal
                 const userEmail = email;
                 const paymentResponse = await PaymentService.processPayment(orderId, userEmail);
-                
+    
                 if (paymentResponse.status === 201) {
-                    // Redirect to PayPal approval URL
                     const approvalUrl = paymentResponse.data.approvalUrl;
                     if (approvalUrl) {
-                        window.location.href = approvalUrl;
+                        window.location.href = approvalUrl;  // Перенаправляем на PayPal
                     } else {
-                        console.error("Approval URL not found in the payment response.");
                         alert("Failed to retrieve payment approval URL. Please try again.");
                     }
                 }
             } else {
-                console.error("Error: Order creation failed or returned unexpected data.", orderResponse);
                 alert("Failed to create order. Please try again.");
             }
         } catch (error) {
-            console.error("Error processing payment:", error.response || error);
+            console.error("Error processing payment:", error);
             setError("An error occurred while processing payment. Please try again.");
         }
     };
+    
 
     return (
         <div className="container mx-auto p-6 max-w-5xl bg-gray-50 rounded-lg shadow-lg">
