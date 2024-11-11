@@ -77,6 +77,7 @@ const getBookCopyById = async (id) => {
 const getAllBookCopies = async () => {
     try {
         const response = await axios.get(BASE_URL, { headers: getAuthHeader() });
+        console.log("Fetched copies:", response.data); // Проверьте количество и данные копий
         return response.data;
     } catch (error) {
         console.error("Error fetching all book copies:", error.response || error);

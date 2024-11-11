@@ -12,6 +12,7 @@ import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/comp
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Label } from '@/components/ui/label';
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { CartItemService } from '@/Services/CartItemService/CartItemService';
 
 
 function FavoritesPage() {
@@ -74,13 +75,26 @@ function FavoritesPage() {
     };
 
     const handleAddToCart = async (copyId) => {
-        try {
-            await UserDetailService.addUserFavorite(userId, copyId);
-            alert("Item added to cart!");
-        } catch (error) {
-            console.error("Error adding item to cart:", error);
-        }
-    };
+      if (!userId) {
+          alert("You need to be logged in to add items to the cart.");
+          return;
+      }
+  
+      try {
+          const cartItemData = {
+              userId,  // Use the user's ID
+              bookCopyId: copyId,  // Pass the book copy ID instead of the book ID
+              quantity: 1  // Default quantity
+          };
+          
+          await CartItemService.createCartItem(cartItemData);
+          alert("Item added to cart successfully!");
+      } catch (error) {
+          console.error("Error adding item to cart:", error);
+          alert("Failed to add item to cart. Please try again.");
+      }
+  };
+  
 
     const copyToClipboard = (url) => {
         navigator.clipboard.writeText(url);

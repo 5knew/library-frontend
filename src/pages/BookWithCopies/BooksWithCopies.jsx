@@ -41,33 +41,25 @@ function BooksWithCopies() {
 
     const fetchBooksAndCopies = async () => {
         try {
-            // Fetch all books and book copies
             const booksData = await BookService.getAllBooks();
             const bookCopiesData = await BookCopyService.getAllBookCopies();
-    
-            // Ensure booksData and bookCopiesData are arrays
+            
             const booksArray = Array.isArray(booksData) ? booksData : [];
             const copiesArray = Array.isArray(bookCopiesData) ? bookCopiesData : [];
-    
-            if (!Array.isArray(booksData)) {
-                console.error("Error: booksData is not an array:", booksData);
-            }
-    
-            if (!Array.isArray(bookCopiesData)) {
-                console.error("Error: bookCopiesData is not an array:", bookCopiesData);
-            }
-    
-            // Map books with their respective copies
+            
             const booksWithCopies = booksArray.map((book) => ({
                 ...book,
                 copies: copiesArray.filter((copy) => copy.book?.id === book.id),
             }));
-    
+            
+            console.log("Books with copies:", booksWithCopies); // Вывод книг и их копий
+            
             setBooks(booksWithCopies);
         } catch (error) {
             console.error("Error fetching books or book copies:", error);
         }
     };
+    
 
     const handleAddToCart = async (copyId) => {
         if (!userId) {
