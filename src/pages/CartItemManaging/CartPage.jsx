@@ -11,6 +11,8 @@ const CartPage = () => {
     const [email, setEmail] = useState(null);
     const [totalPrice, setTotalPrice] = useState(0);
     const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(false);
+
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -26,16 +28,20 @@ const CartPage = () => {
         }
     }, []);
 
+
     const fetchCartItems = async (userId) => {
         try {
             const response = await CartItemService.getCartItemsByUserId(userId);
-            setCartItems(response.data || []);
-            calculateTotalPrice(response.data || []);
+            console.log('response: ', response);
+            setCartItems(Array.isArray(response.data) ? response.data : []);
+            calculateTotalPrice(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             console.error("Error fetching cart items:", error);
             setError("Failed to fetch cart items.");
         }
     };
+    
+
 
     const calculateTotalPrice = (items) => {
         const total = items.reduce((acc, item) => acc + item.bookCopy.price, 0);
@@ -62,15 +68,23 @@ const CartPage = () => {
             if (orderResponse.status === 201 && orderResponse.data) {
                 const orderId = orderResponse.data.id;
                 const userEmail = email;
-                const paymentResponse = await PaymentService.processPayment(orderId, userEmail);
     
-                if (paymentResponse.status === 201) {
+                // Add Authorization header with token if required
+                const paymentResponse = await PaymentService.processPayment(orderId, userEmail, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+    
+                if (paymentResponse && paymentResponse.status === 201) {
                     const approvalUrl = paymentResponse.data.approvalUrl;
                     if (approvalUrl) {
-                        window.location.href = approvalUrl;  // Перенаправляем на PayPal
+                        window.location.href = approvalUrl;
                     } else {
                         alert("Failed to retrieve payment approval URL. Please try again.");
                     }
+                } else {
+                    alert("Failed to process payment. Please try again.");
                 }
             } else {
                 alert("Failed to create order. Please try again.");
@@ -80,6 +94,7 @@ const CartPage = () => {
             setError("An error occurred while processing payment. Please try again.");
         }
     };
+    
     
 
     return (
@@ -95,9 +110,14 @@ const CartPage = () => {
                             <div key={item.id} className="p-4 bg-white rounded-lg shadow-md border border-gray-200 flex justify-between items-center">
                                 <div>
                                     <h2 className="text-xl font-semibold">{item.bookCopy.book.name}</h2>
+                            
                                     <p className="text-gray-600"><strong>Authors:</strong> {item.bookCopy.book.authors.map(author => author.name).join(', ')}</p>
+                                    <p className="text-gray-600"><strong>Categories:</strong> {item.bookCopy.book.categories.map(category => category.name).join(', ')}</p>
+                                    <h2 className="text-gray-600 "><strong>Description:</strong> {item.bookCopy.book.description}</h2>
+                                    
+                                    <p className="text-gray-600"><strong>Language of a Pdf:</strong> {item.bookCopy.language}</p>
+                                    <p className="text-gray-600"><strong>Publication Date:</strong> {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(item.bookCopy.publicationDate))}</p>
                                     <p className="text-gray-600"><strong>Price:</strong> {item.bookCopy.price} tg </p>
-                                    <p className="text-gray-600"><strong>Condition:</strong> {item.bookCopy.condition}</p>
                                 </div>
                                 <button 
                                     onClick={() => handleDeleteCartItem(item.id)}
