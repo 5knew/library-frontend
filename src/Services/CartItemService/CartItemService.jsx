@@ -22,6 +22,13 @@ const getCartItemById = (id) => {
     });
 };
 
+// Get cart items by Order ID
+const getCartItemsByOrderId = (orderId) => {
+    return axios.get(`${BASE_URL}/order/${orderId}`, {
+        headers: getAuthHeader()
+    });
+};
+
 // Get all cart items
 const getAllCartItems = () => {
     return axios.get(BASE_URL, {
@@ -64,5 +71,6 @@ export const CartItemService = {
     updateCartItem,
     deleteCartItem,
     searchCartItems,
-    getCartItemsByUserId
+    getCartItemsByUserId,
+    getCartItemsByOrderId
 };

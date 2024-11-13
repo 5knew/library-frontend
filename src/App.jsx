@@ -30,6 +30,7 @@ import FavoritesPage from './pages/UserProfileManaging/FavoritesPage';
 import ThemeProvider from './components/ThemeProvider';
 import PaymentSuccess from './pages/PaymentManaging/PaymentSuccess';
 import PaymentFailure from './pages/PaymentManaging/PaymentFailure';
+import OrdersPage from './pages/OrderManaging/OrdersPage';
 
 const App = () => {
   const handleSignIn = (token, refreshToken) => {
@@ -43,6 +44,7 @@ const App = () => {
           <Routes>
             <Route path="/signin" element={<SignIn onSignIn={handleSignIn} />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/orders" element={<OrdersPage />} />
 
             {/* All protected routes go inside ProtectedLayout */}
             <Route path="/" element={<ProtectedLayout><Books /></ProtectedLayout>} />

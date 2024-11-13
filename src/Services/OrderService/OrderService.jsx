@@ -23,12 +23,23 @@ const getOrderById = (id) => {
     return axios.get(`${BASE_URL}/${id}`, { headers: getAuthHeader() })
         .catch(error => console.error("Ошибка получения заказа по ID:", error));
 };
+// Fetch paginated orders
+// const getOrders = (page = 0, size = 10) => {
+//     return axios.get(`${BASE_URL}`, {
+//         params: { page, size },
+//     });
+// };
+
 
 // Получить все заказы
-const getAllOrders = () => {
-    return axios.get(BASE_URL, { headers: getAuthHeader() })
-        .catch(error => console.error("Ошибка получения всех заказов:", error));
+const getAllOrders = (page = 0, size = 10) => {
+    return axios.get(BASE_URL, { 
+        headers: getAuthHeader(),
+        params: { page, size },
+    })
+    .catch(error => console.error("Ошибка получения всех заказов:", error));
 };
+
 
 // Получить заказы по ID пользователя
 const getOrdersByUserId = (userId) => {
