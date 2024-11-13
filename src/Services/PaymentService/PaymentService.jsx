@@ -8,9 +8,9 @@ const getAuthHeader = () => {
 };
 
 // Process payment for the order
-const processPayment = (orderId, userEmail) => {
-    return axios.post(`${BASE_URL}/process`, null, {
-        params: { orderId, userEmail },
+const processPayment = (userEmail, userId, cartItemIds,) => {
+    return axios.post(`${BASE_URL}/process`, cartItemIds, {
+        params: { userEmail, userId },
         headers: getAuthHeader(),
     }).catch(error => console.error("Error processing payment:", error));
 };

@@ -63,14 +63,14 @@ const CartPage = () => {
     const handleProceedToPayment = async () => {
         try {
             const cartItemIds = cartItems.map(item => item.id);
-            const orderResponse = await OrderService.createOrder(userId, cartItemIds);
+            // const orderResponse = await OrderService.createOrder(userId, cartItemIds);
     
-            if (orderResponse.status === 201 && orderResponse.data) {
-                const orderId = orderResponse.data.id;
+            // if (orderResponse.status === 201 && orderResponse.data) {
+                // const orderId = orderResponse.data.id;
                 const userEmail = email;
     
                 // Add Authorization header with token if required
-                const paymentResponse = await PaymentService.processPayment(orderId, userEmail, {
+                const paymentResponse = await PaymentService.processPayment(userEmail, userId, cartItemIds, {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('token')}`
                     }
@@ -86,9 +86,9 @@ const CartPage = () => {
                 } else {
                     alert("Failed to process payment. Please try again.");
                 }
-            } else {
-                alert("Failed to create order. Please try again.");
-            }
+            // } else {
+            //     alert("Failed to create order. Please try again.");
+            // }
         } catch (error) {
             console.error("Error processing payment:", error);
             setError("An error occurred while processing payment. Please try again.");
