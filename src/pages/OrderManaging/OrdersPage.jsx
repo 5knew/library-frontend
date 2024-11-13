@@ -22,7 +22,7 @@ const OrdersPage = () => {
 
     useEffect(() => {
         fetchOrders(page, size);
-    }, [page]);
+    }, [page]);  // only depend on `page`
 
     const fetchOrders = async (page, size) => {
         try {
@@ -47,19 +47,18 @@ const OrdersPage = () => {
                             // Fetch author and category names
                             const authorNames = await Promise.all(
                                 bookDetails.authors.map(async (author) => {
-                                    const authorId = author.id; // Ensure this is an ID
+                                    const authorId = author.id;
                                     const authorData = await AuthorService.getAuthorById(authorId);
                                     return authorData.name;
                                 })
-                                
                             );
 
                             const categoryNames = await Promise.all(
                                 bookDetails.categories.map(async (category) => {
-                                    const categoryId = category.id; // Ensure this is an ID
+                                    const categoryId = category.id;
                                     const categoryData = await CategoryService.getCategoryById(categoryId);
                                     return categoryData.name;
-                                })                                
+                                })
                             );
 
                             return {
@@ -88,7 +87,7 @@ const OrdersPage = () => {
     };
 
     const handlePageChange = (newPage) => {
-        setPage(newPage);
+        setPage(newPage); // Update `page` directly to trigger a re-fetch
     };
 
     const generatePageNumbers = () => {
@@ -103,60 +102,119 @@ const OrdersPage = () => {
     };
 
     return (
-        <div className="orders-page">
-            <h1>Orders</h1>
-            <ul>
-                {orders.map(order => (
-                    <li key={order.id}>
-                        <h2>Order ID: {order.id}</h2>
-                        {order.user && (
-                            <>
-                                <p>User ID: {order.user.id}</p>
-                                <p>Name: {order.user.firstName} {order.user.lastName}</p>
-                                <p>Email: {order.user.email}</p>
-                                <p>Phone: {order.user.phoneNumber || "N/A"}</p>
-                            </>
-                        )}
-                        <p>Total Amount: {order.totalAmount || "N/A"}</p>
-                        <p>Order Date: {order.orderDate ? new Date(order.orderDate).toLocaleDateString() : "N/A"}</p>
-
-                        {/* Display Cart Items with Book Copy and Book Details */}
-                        <h3>Cart Items</h3>
-                        <ul>
-                            {order.cartItems && order.cartItems.map(cartItem => (
-                                <li key={cartItem.id}>
-                                    <p>Book Copy ID: {cartItem.bookCopy.id}</p>
-                                    <p>Quantity: {cartItem.quantity}</p>
-                                    <p>Book ID: {cartItem.book.id}</p>
-                                    <p>Book Name: {cartItem.book.name}</p>
-                                    <p>ISBN: {cartItem.book.isbn}</p>
-                                    <p>Price: {cartItem.bookCopy.price}</p>
-                                    <p>Publication Date: {new Date(cartItem.bookCopy.publicationDate).toLocaleDateString()}</p>
-                                    <p>Language: {cartItem.bookCopy.language}</p>
-                                    <p>Categories: {cartItem.book.categoryNames.join(", ")}</p>
-                                    <p>Authors: {cartItem.book.authorNames.join(", ")}</p>
-                                </li>
-                            ))}
-                        </ul>
-                    </li>
-                ))}
-            </ul>
-            <div className="pagination">
-                <button onClick={() => handlePageChange(page - 1)} disabled={page === 0}>
-                    Previous
-                </button>
+        <div className="container mx-auto py-10">
+            <h1 className="text-3xl font-bold mb-6">Orders</h1>
+            {orders.map(order => (
+                <Card key={order.id} className="mb-6">
+                    <CardHeader>
+                        <CardTitle className="flex justify-between items-center">
+                            <span>Order ID: {order.id}</span>
+                            <Badge variant="outline">
+                                {order.orderDate ? new Date(order.orderDate).toLocaleDateString() : "N/A"}
+                            </Badge>
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <h3 className="text-lg font-semibold mb-2 flex items-center">
+                                    <User className="mr-2" /> Customer Information
+                                </h3>
+                                {order.user && (
+                                    <div className="space-y-1">
+                                        <p>User ID: {order.user.id}</p>
+                                        <p>Name: {order.user.firstName} {order.user.lastName}</p>
+                                        <p>Email: {order.user.email}</p>
+                                        <p>Phone: {order.user.phoneNumber || "N/A"}</p>
+                                    </div>
+                                )}
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-semibold mb-2 flex items-center">
+                                    <Package className="mr-2" /> Order Details
+                                </h3>
+                                <div className="space-y-1">
+                                    <p className="flex items-center">
+                                        <Calendar className="mr-2" size={16} />
+                                        Order Date: {order.orderDate ? new Date(order.orderDate).toLocaleDateString() : "N/A"}
+                                    </p>
+                                    <p className="flex items-center">
+                                        <DollarSign className="mr-2" size={16} />
+                                        Total Amount: {order.totalAmount ? `$${order.totalAmount.toFixed(2)}` : "N/A"}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <Separator className="my-4" />
+                        <h3 className="text-lg font-semibold mb-4 flex items-center">
+                            <Book className="mr-2" /> Cart Items
+                        </h3>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Book Name</TableHead>
+                                    <TableHead>Quantity</TableHead>
+                                    <TableHead>Price</TableHead>
+                                    <TableHead>Publication Date</TableHead>
+                                    <TableHead>Language</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {order.cartItems && order.cartItems.map(cartItem => (
+                                    <TableRow key={cartItem.id}>
+                                        <TableCell>
+                                            <div>
+                                                <p className="font-medium">{cartItem.book.name}</p>
+                                                <p className="text-sm text-muted-foreground">ISBN: {cartItem.book.isbn}</p>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>{cartItem.quantity}</TableCell>
+                                        <TableCell>${cartItem.bookCopy.price.toFixed(2)}</TableCell>
+                                        <TableCell>{new Date(cartItem.bookCopy.publicationDate).toLocaleDateString()}</TableCell>
+                                        <TableCell>{cartItem.bookCopy.language}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                        <div className="mt-4 space-y-2">
+                            <p className="flex items-center">
+                                <Hash className="mr-2" size={16} />
+                                Categories: {order.cartItems && order.cartItems[0] ? order.cartItems[0].book.categoryNames.join(", ") : "N/A"}
+                            </p>
+                            <p className="flex items-center">
+                                <User className="mr-2" size={16} />
+                                Authors: {order.cartItems && order.cartItems[0] ? order.cartItems[0].book.authorNames.join(", ") : "N/A"}
+                            </p>
+                        </div>
+                    </CardContent>
+                </Card>
+            ))}
+            <div className="flex justify-center items-center space-x-2 mt-6">
+                <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => handlePageChange(page - 1)}
+                    disabled={page === 0}
+                >
+                    <ChevronLeft className="h-4 w-4" />
+                </Button>
                 {generatePageNumbers().map((pageNumber) => (
-                    <button
+                    <Button
                         key={pageNumber}
+                        variant={pageNumber === page ? "default" : "outline"}
                         onClick={() => handlePageChange(pageNumber)}
-                        className={pageNumber === page ? 'active' : ''}
                     >
                         {pageNumber + 1}
-                    </button>
+                    </Button>
                 ))}
-                <button onClick={() => handlePageChange(page + 1)} disabled={page >= totalPages - 1}>
-                    Next
-                </button>
+                <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => handlePageChange(page + 1)}
+                    disabled={page >= totalPages - 1}
+                >
+                    <ChevronRight className="h-4 w-4" />
+                </Button>
             </div>
         </div>
     );
