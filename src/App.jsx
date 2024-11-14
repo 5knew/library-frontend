@@ -31,6 +31,7 @@ import ThemeProvider from './components/ThemeProvider';
 import PaymentSuccess from './pages/PaymentManaging/PaymentSuccess';
 import PaymentFailure from './pages/PaymentManaging/PaymentFailure';
 import OrdersPage from './pages/OrderManaging/OrdersPage';
+import UserOrdersPage from './pages/OrderManaging/UserOrdersPage';
 
 const App = () => {
   const handleSignIn = (token, refreshToken) => {
@@ -45,6 +46,7 @@ const App = () => {
             <Route path="/signin" element={<SignIn onSignIn={handleSignIn} />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/orders" element={<OrdersPage />} />
+            
 
             {/* All protected routes go inside ProtectedLayout */}
             <Route path="/" element={<ProtectedLayout><Books /></ProtectedLayout>} />
@@ -72,6 +74,14 @@ const App = () => {
             <Route path="/favorites" element={<ProtectedRoute acceptedRoles={['ROLE_ADMIN', 'ROLE_LIBRARIAN', 'ROLE_STUDENT']}><ProtectedLayout><FavoritesPage /></ProtectedLayout></ProtectedRoute>} />
             <Route path="/payment/success" element={<ProtectedRoute acceptedRoles={['ROLE_ADMIN', 'ROLE_LIBRARIAN', 'ROLE_STUDENT']}><ProtectedLayout><PaymentSuccess /></ProtectedLayout></ProtectedRoute>} />
             <Route path="/payment/failure" element={<ProtectedRoute acceptedRoles={['ROLE_ADMIN', 'ROLE_LIBRARIAN', 'ROLE_STUDENT']}><ProtectedLayout><PaymentFailure /></ProtectedLayout></ProtectedRoute>} />
+            <Route
+            path="/my-orders"
+            element={
+              <ProtectedRoute acceptedRoles={['ROLE_STUDENT', 'ROLE_LIBRARIAN', 'ROLE_ADMIN']}>
+                <ProtectedLayout><UserOrdersPage /></ProtectedLayout>
+              </ProtectedRoute>
+            }
+          />
           </Routes>
         </BrowserRouter>
     </ThemeProvider>

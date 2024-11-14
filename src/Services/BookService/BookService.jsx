@@ -37,15 +37,20 @@ const BookService = {
     }
   },
 
-  getAllBooks: async () => {
-    try {
-      const response = await axios.get(BASE_URL, { headers: getAuthHeader() });
+  // BookService.js
+getAllBooks: async (page = 0, size = 10) => {
+  try {
+      const response = await axios.get(BASE_URL, {
+          headers: getAuthHeader(),
+          params: { page, size },
+      });
       return response.data;
-    } catch (error) {
+  } catch (error) {
       console.error("Error fetching all books:", error.response || error);
       throw error;
-    }
-  },
+  }
+},
+
 
   updateBook: async (id, formData) => {
     try {

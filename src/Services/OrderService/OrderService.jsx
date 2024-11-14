@@ -42,10 +42,15 @@ const getAllOrders = (page = 0, size = 10) => {
 
 
 // Получить заказы по ID пользователя
-const getOrdersByUserId = (userId) => {
-    return axios.get(`${BASE_URL}/user/${userId}`, { headers: getAuthHeader() })
-        .catch(error => console.error("Ошибка получения заказов по ID пользователя:", error));
+// Fetch orders by user ID with optional pagination
+const getOrdersByUserId = (userId, page = 0, size = 10) => {
+    return axios.get(`${BASE_URL}/user/${userId}`, {
+        headers: getAuthHeader(),
+        params: { page, size }
+    })
+    .catch(error => console.error("Error fetching orders by user ID:", error));
 };
+
 
 // Обновить заказ по ID
 const updateOrder = (id, orderData) => {
@@ -59,6 +64,12 @@ const deleteOrder = (id) => {
         .catch(error => console.error("Ошибка удаления заказа:", error));
 };
 
+const cancelOrder = (orderId) => {
+    return axios.put(`${BASE_URL}/${orderId}/cancel`, null, {
+        headers: getAuthHeader(),
+    }).catch(error => console.error("Error canceling order:", error));
+};
+
 export const OrderService = {
     createOrder,
     getOrderById,
@@ -66,4 +77,5 @@ export const OrderService = {
     getOrdersByUserId,
     updateOrder,
     deleteOrder,
+    cancelOrder
 };

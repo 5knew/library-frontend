@@ -1,10 +1,10 @@
+// Books.js
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { jwtDecode } from 'jwt-decode'
 import BookService from '../../Services/BookService/BookService'
 import AdvancedSearch from '../../components/AdvancedSearch'
 import CategoryService from '@/Services/CategoryService/CategoryService'
-
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -12,20 +12,21 @@ import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Pencil, Trash2, Copy } from 'lucide-react';
+import { Pencil, Trash2, Copy, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 function Books() {
-    const [books, setBooks] = useState([])
-    const [categories, setCategories] = useState([]); // State for categories
-    const [query, setQuery] = useState('')
-    const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
-    const [isEmpty, setIsEmpty] = useState(false)
-    const navigate = useNavigate()
+    const [books, setBooks] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [query, setQuery] = useState('');
+    const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+    const [isEmpty, setIsEmpty] = useState(false);
+    const [page, setPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const navigate = useNavigate();
+    const [selectedCategory, setSelectedCategory] = useState('');
     const [userRole, setUserRole] = useState('')
-    const [selectedCategory, setSelectedCategory] = useState('')
 
-    // ... (keep existing useEffect, fetchAllBooks, handleBasicSearch, handleAdvancedSearch)
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
@@ -36,25 +37,45 @@ function Books() {
                 console.error("Invalid token", error);
             }
         }
-        fetchAllBooks();
+        fetchAllBooks(page); // Fetch books with pagination
         fetchCategories();
-    }, []);
+    }, [page]);
 
     const fetchCategories = async () => {
         try {
             const categoriesData = await CategoryService.getAllCategories();
-            setCategories(Array.isArray(categoriesData) ? categoriesData : []); // Ensure categoriesData is an array
+            setCategories(Array.isArray(categoriesData) ? categoriesData : []);
         } catch (error) {
             console.error("Error fetching categories:", error);
         }
     };
-    const fetchAllBooks = async () => {
+
+    const fetchAllBooks = async (page) => {
         try {
-            const booksData = await BookService.getAllBooks();
-            setBooks(booksData || []);
-            setIsEmpty((booksData || []).length === 0);
+            const response = await BookService.getAllBooks(page, 10); // Pass page and size
+            setBooks(response.content || []);
+            setTotalPages(response.totalPages || 0);
+            setIsEmpty(response.content?.length === 0);
         } catch (error) {
             console.error("Error fetching books:", error);
+        }
+    };
+
+    const handlePageChange = (newPage) => {
+        if (newPage >= 0 && newPage < totalPages) setPage(newPage);
+    };
+
+    const handleCategoryChange = async (value) => {
+        setSelectedCategory(value);
+        if (value === 'all') {
+            fetchAllBooks(0); // Reset to the first page
+        } else {
+            try {
+                const booksData = await BookService.getBooksByCategoryId(value);
+                setBooks(booksData || []);
+            } catch (error) {
+                console.error("Error filtering books by category:", error);
+            }
         }
     };
     const handleBasicSearch = async (e) => {
@@ -74,7 +95,6 @@ function Books() {
             setIsEmpty(true);
         }
     };
-
     const handleAdvancedSearch = async (filters) => {
         if (!filters || Object.keys(filters).length === 0) {
             fetchAllBooks(); // Fetch all books if filters are empty
@@ -120,27 +140,23 @@ function Books() {
         })
     }
 
-    const handleCategoryChange = async (value) => {
-        setSelectedCategory(value);
-        if (value === 'all') {
-            fetchAllBooks();
-        } else {
-            try {
-                const booksData = await BookService.getBooksByCategoryId(value);
-                setBooks(booksData || []);
-            } catch (error) {
-                console.error("Error filtering books by category:", error);
-            }
-        }
-    };
-
-
-
+    // const handleCategoryChange = async (value) => {
+    //     setSelectedCategory(value);
+    //     if (value === 'all') {
+    //         fetchAllBooks();
+    //     } else {
+    //         try {
+    //             const booksData = await BookService.getBooksByCategoryId(value);
+    //             setBooks(booksData || []);
+    //         } catch (error) {
+    //             console.error("Error filtering books by category:", error);
+    //         }
+    //     }
+    // };
 
     return (
         <div className="container mx-auto p-6 space-y-8">
             <Label className='text-5xl'>Books</Label>
-
             <div className="flex justify-between items-center">
                 <form onSubmit={handleBasicSearch} className="flex gap-2">
                     <Input
@@ -151,8 +167,6 @@ function Books() {
                     />
                     <Button>Search</Button>
                 </form>
-                
-                {/* Category Filter */}
                 <Select onValueChange={handleCategoryChange}>
                     <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Select Category" />
@@ -167,7 +181,6 @@ function Books() {
                     </SelectContent>
                 </Select>
             </div>
-
             <Button
                 onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
                 variant="outline"
@@ -213,73 +226,27 @@ function Books() {
                                 <TableCell>{book.categories?.map(category => category.name).join(', ')}</TableCell>
                                 <TableCell>{book.isbn}</TableCell>
                                 <TableCell>
-                                    <div className="flex items-center space-x-2">
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <Button variant="outline" size="sm" onClick={() => handleEditBook(book.id)}>
-                                                        <Pencil className="h-4 w-4" />
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>Edit Book</p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-                                        <Dialog>
-                                            <DialogTrigger asChild>
-                                                <Button variant="outline" size="sm">
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </DialogTrigger>
-                                            <DialogContent>
-                                                <DialogHeader>
-                                                    <DialogTitle>Are you sure you want to delete this book?</DialogTitle>
-                                                    <DialogDescription>
-                                                        This action cannot be undone.
-                                                    </DialogDescription>
-                                                </DialogHeader>
-                                                <DialogFooter>
-                                                    <Button variant="outline" onClick={() => {}}>Cancel</Button>
-                                                    <Button variant="destructive" onClick={() => handleDeleteBook(book.id)}>Delete</Button>
-                                                </DialogFooter>
-                                            </DialogContent>
-                                        </Dialog>
-                                        {book.previewPdf && (
-                                            <TooltipProvider>
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <Button variant="outline" size="sm" onClick={() => copyToClipboard(book.previewPdf)}>
-                                                            <Copy className="h-4 w-4" /> Preview PDF
-                                                        </Button>
-                                                    </TooltipTrigger>
-                                                    <TooltipContent>
-                                                        <p>Copy Preview Link</p>
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
-                                        )}
-                                        {book.fullPdf && (
-                                            <TooltipProvider>
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <Button variant="outline" size="sm" onClick={() => copyToClipboard(book.fullPdf)}>
-                                                            <Copy className="h-4 w-4" /> Full PDF
-                                                        </Button>
-                                                    </TooltipTrigger>
-                                                    <TooltipContent>
-                                                        <p>Copy Full PDF Link</p>
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
-                                        )}
-                                    </div>
+                                    <Button variant="outline" size="sm" onClick={() => handleEditBook(book.id)}>
+                                        <Pencil className="h-4 w-4" />
+                                    </Button>
+                                    <Button variant="outline" size="sm" onClick={() => handleDeleteBook(book.id)}>
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
                                 </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             )}
+            <div className="flex justify-center items-center space-x-2 mt-6">
+                <Button variant="outline" size="icon" onClick={() => handlePageChange(page - 1)} disabled={page === 0}>
+                    <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <span>Page {page + 1} of {totalPages}</span>
+                <Button variant="outline" size="icon" onClick={() => handlePageChange(page + 1)} disabled={page >= totalPages - 1}>
+                    <ChevronRight className="h-4 w-4" />
+                </Button>
+            </div>
         </div>
     );
 }
