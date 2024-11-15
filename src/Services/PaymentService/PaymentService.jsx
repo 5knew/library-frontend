@@ -44,10 +44,21 @@ const getPaymentByTransactionId = (transactionId) => {
 };
 
 // Get payment by order ID
-const getPaymentByOrderId = (orderId) => {
-    return axios.get(`${BASE_URL}/order/${orderId}`, { headers: getAuthHeader() })
-        .catch(error => console.error("Error fetching payment by order ID:", error));
+const getPaymentByOrderId = async (orderId) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/order/${orderId}`, { headers: getAuthHeader() });
+        return response.data;
+    } catch (error) {
+        if (error.response && error.response.status === 404) {
+            console.error("Payment not found for this order ID:", orderId);
+            return null; // Return null if payment not found
+        } else {
+            console.error("Error fetching payment by order ID:", error);
+            throw error; // Throw other errors for further handling
+        }
+    }
 };
+
 
 // Get all payments
 const getAllPayments = async () => {
