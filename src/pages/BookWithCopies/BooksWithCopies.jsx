@@ -22,13 +22,17 @@ function BooksWithCopies() {
     const [favoriteBookIds, setFavoriteBookIds] = useState([]);
     const [userId, setUserId] = useState(null);
     const navigate = useNavigate();
+    
+
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
 
     useEffect(() => {
         const storedUserId = localStorage.getItem('userId');
         if (storedUserId) {
             setUserId(storedUserId);
             fetchFavoriteBookIds(storedUserId);
-            fetchBooksAndCopies();
+            fetchBooksAndCopies(currentPage);
         } else {
             console.error("UserId is missing in localStorage.");
         }
@@ -43,27 +47,30 @@ function BooksWithCopies() {
         }
     };
 
-    const fetchBooksAndCopies = async () => {
-        try {
-            const booksData = await BookService.getAllBooks();
-            const bookCopiesData = await BookCopyService.getAllBookCopies();
-            console.log('booksData: ', booksData);
-            console.log('bookCopiesData: ', bookCopiesData);
-            
-            const booksArray = Array.isArray(booksData) ? booksData : [];
-            const copiesArray = Array.isArray(bookCopiesData) ? bookCopiesData : [];
+    const fetchBooksAndCopies = async (page = 0) => {
+      try {
+          const booksData = await BookService.getAllBooks(page);
+          const bookCopiesData = await BookCopyService.getAllBookCopies();
 
-            console.log('Books array: ', booksArray);
-            console.log('Books Instances array: ', copiesArray);
-            
-            const booksWithCopies = booksArray.map((book) => ({
-                ...book,
-                copies: copiesArray.filter((copy) => copy.book?.id === book.id),
-            }));
-            
-            setBooks(booksWithCopies);
-        } catch (error) {
-            console.error("Error fetching books or book copies:", error);
+          const booksArray = Array.isArray(booksData.content) ? booksData.content : [];
+          const copiesArray = Array.isArray(bookCopiesData) ? bookCopiesData : [];
+
+          const booksWithCopies = booksArray.map((book) => ({
+              ...book,
+              copies: copiesArray.filter((copy) => copy.book?.id === book.id),
+          }));
+
+          setBooks((prevBooks) => [...prevBooks, ...booksWithCopies]);
+          setCurrentPage(booksData.pageable.pageNumber);
+          setTotalPages(booksData.totalPages);
+      } catch (error) {
+          console.error("Error fetching books or book copies:", error);
+      }
+  };
+
+   const loadMoreBooks = () => {
+        if (currentPage + 1 < totalPages) {
+            fetchBooksAndCopies(currentPage + 1);
         }
     };
     
@@ -242,11 +249,17 @@ function BooksWithCopies() {
                     )}
                   </CardContent>
                 </div>
+              
               </Card>
             ))
           ) : (
             <p>No books found.</p>
           )}
+           {currentPage + 1 < totalPages && (
+                <button onClick={loadMoreBooks} className="mt-4 mx-auto block p-2 border rounded bg-gray-200">
+                    Load More
+                </button>
+            )}
         </div>
     );
 }

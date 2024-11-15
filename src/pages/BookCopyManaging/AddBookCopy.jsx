@@ -20,16 +20,17 @@ function AddBookCopy() {
     const [books, setBooks] = useState([]);
 
     useEffect(() => {
-        async function fetchBooks() {
-            try {
-                const bookList = await BookService.getAllBooks();
-                setBooks(bookList);
-            } catch (error) {
-                console.error("Error fetching books:", error);
-            }
-        }
-        fetchBooks();
-    }, []);
+      async function fetchBooks() {
+          try {
+              const response = await BookService.getAllBooks();
+              setBooks(response.content || []); // Access the `content` array within the response
+          } catch (error) {
+              console.error("Error fetching books:", error);
+          }
+      }
+      fetchBooks();
+  }, []);
+  
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -66,10 +67,11 @@ function AddBookCopy() {
     };
 
     // Convert books to options for react-select
-    const bookOptions = books.map(book => ({
-        value: book.id,
-        label: book.name
-    }));
+    const bookOptions = Array.isArray(books) ? books.map(book => ({
+      value: book.id,
+      label: book.name
+  })) : [];
+  
 
     return (
         <Card className="max-w-md mx-auto mt-10">
